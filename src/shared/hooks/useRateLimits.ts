@@ -24,7 +24,7 @@ export const useRateLimits = () => {
   // Проверка лимита на расклады (1 расклад в 30 секунд)
   const canCreateReading = useCallback(() => {
     const now = Date.now();
-    const fiveMinutes = 1 * 30 * 1000;
+    const fiveMinutes = 1 * 60 * 1000;
 
     const lastReading = readingLimits.sort(
       (a, b) => b.lastReading - a.lastReading
@@ -39,7 +39,7 @@ export const useRateLimits = () => {
   const canSendMessage = useCallback(
     (readingId: string) => {
       const now = Date.now();
-      const fiveMinutes = 1 * 30 * 1000;
+      const fiveMinutes = 1 * 60 * 1000;
 
       const readingLimit = readingLimits.find((r) => r.readingId === readingId);
       if (!readingLimit) return true;
@@ -55,7 +55,7 @@ export const useRateLimits = () => {
   // Получение времени до следующего расклада
   const getTimeUntilNextReading = useCallback(() => {
     const now = Date.now();
-    const fiveMinutes = 5 * 60 * 1000;
+    const fiveMinutes = 1 * 60 * 1000;
 
     const lastReading = readingLimits.sort(
       (a, b) => b.lastReading - a.lastReading
@@ -73,7 +73,7 @@ export const useRateLimits = () => {
   const getTimeUntilNextMessage = useCallback(
     (readingId: string) => {
       const now = Date.now();
-      const fiveMinutes = 5 * 60 * 1000;
+      const fiveMinutes = 1 * 60 * 1000;
 
       const messageLimit = messageLimits[readingId];
       if (!messageLimit) return 0;
@@ -127,6 +127,21 @@ export const useRateLimits = () => {
     [setMessageLimits, setReadingLimits]
   );
 
+  // Проверка наличия активных лимитов
+  const hasActiveMessageLimit = useCallback(
+    (readingId: string) => {
+      const messageLimit = messageLimits[readingId];
+      if (!messageLimit) return false;
+
+      const now = Date.now();
+      const fiveMinutes = 1 * 60 * 1000;
+      const timePassed = now - messageLimit.lastAction;
+
+      return timePassed < fiveMinutes;
+    },
+    [messageLimits]
+  );
+
   // Форматирование времени ожидания
   const formatTimeLeft = useCallback((timeLeft: number) => {
     const minutes = Math.floor(timeLeft / 60000);
@@ -143,6 +158,7 @@ export const useRateLimits = () => {
     canSendMessage,
     getTimeUntilNextReading,
     getTimeUntilNextMessage,
+    hasActiveMessageLimit,
     registerReading,
     registerMessage,
     formatTimeLeft,

@@ -309,6 +309,7 @@ export default function HistoryPage() {
                       className="h-fit max-h-[500px]"
                       readingId={selectedReading.id}
                       onRateLimitExceeded={() => setShowPremiumModal(true)}
+                      onPremiumClick={() => setShowPremiumModal(true)}
                     />
                   )}
                   {/* Карты расклада */}

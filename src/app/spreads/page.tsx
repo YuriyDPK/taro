@@ -39,17 +39,19 @@ export default function SpreadsPage() {
     "reading" | "message"
   >("reading");
 
+  // Сброс расклада при каждом заходе на страницу (когда кликают в меню)
+  // Состояние автоматически сбрасывается так как selectedSpread инициализируется как null
+
   // История раскладов в localStorage
   const [, setReadings] = useLocalStorage<TarotReading[]>("tarot-readings", []);
 
   // Лимиты на расклады и сообщения
   const {
     canCreateReading,
-    // canSendMessage,
     getTimeUntilNextReading,
     getTimeUntilNextMessage,
+    hasActiveMessageLimit,
     registerReading,
-    // registerMessage,
   } = useRateLimits();
 
   const categories = [
@@ -168,7 +170,7 @@ export default function SpreadsPage() {
   return (
     <div className="min-h-screen p-2 sm:p-4 md:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-6 sm:mb-8">
+        <div className="text-center mb-4">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-light text-white mb-2 sm:mb-4">
             Расклады Таро
           </h1>
@@ -259,12 +261,23 @@ export default function SpreadsPage() {
           // Активный расклад
           <div className="space-y-8">
             <div className="text-center">
-              <h2 className="text-xl sm:text-2xl md:text-3xl font-light text-white mb-2 px-2">
-                {selectedSpread.name}
-              </h2>
+              <div className="flex justify-center items-center gap-4 mb-4">
+                <div className="flex-1">
+                  <h2 className="text-xl sm:text-2xl md:text-3xl font-light text-white mb-0 px-2">
+                    {selectedSpread.name}
+                  </h2>
+                </div>
+              </div>
               <p className="text-sm sm:text-base text-white/70 mb-4 px-2">
                 {selectedSpread.description}
               </p>
+              <Button
+                onClick={resetReading}
+                size="sm"
+                className="bg-black/40 border border-purple-400/30 text-purple-300 hover:text-white mb-4"
+              >
+                ← К выбору раскладов
+              </Button>
               {question && (
                 <div className="bg-black/40 backdrop-blur-sm border border-purple-400/30 rounded-lg p-4 max-w-2xl mx-auto">
                   <div className="text-purple-300 text-sm mb-1">
@@ -309,15 +322,16 @@ export default function SpreadsPage() {
                     <Button onClick={resetReading} size="sm">
                       Новый расклад
                     </Button>
-                    {revealedCards.length === drawnCards.length && (
-                      <Button
-                        onClick={() => setShowChat(true)}
-                        className="bg-gradient-to-r from-purple-600 to-indigo-600"
-                        size="sm"
-                      >
-                        Получить толкование
-                      </Button>
-                    )}
+                    {revealedCards.length === drawnCards.length &&
+                      !showChat && (
+                        <Button
+                          onClick={() => setShowChat(true)}
+                          className="bg-gradient-to-r from-purple-600 to-indigo-600"
+                          size="sm"
+                        >
+                          Получить толкование
+                        </Button>
+                      )}
                   </div>
                 </div>
               </div>
@@ -331,6 +345,10 @@ export default function SpreadsPage() {
                     readingId={currentReading?.id}
                     onRateLimitExceeded={(type) => {
                       setPremiumModalType(type);
+                      setShowPremiumModal(true);
+                    }}
+                    onPremiumClick={() => {
+                      setPremiumModalType("message");
                       setShowPremiumModal(true);
                     }}
                   />
@@ -355,13 +373,17 @@ export default function SpreadsPage() {
           isOpen={showPremiumModal}
           onClose={() => setShowPremiumModal(false)}
           type={premiumModalType}
-          getTimeLeft={() =>
-            premiumModalType === "reading"
-              ? getTimeUntilNextReading()
-              : currentReading?.id
-              ? getTimeUntilNextMessage(currentReading.id)
-              : 0
-          }
+          getTimeLeft={() => {
+            if (premiumModalType === "reading") {
+              return getTimeUntilNextReading();
+            } else {
+              // Для сообщений: если есть активный лимит, показываем время, иначе 0
+              return currentReading?.id &&
+                hasActiveMessageLimit(currentReading.id)
+                ? getTimeUntilNextMessage(currentReading.id)
+                : 0;
+            }
+          }}
         />
       </div>
     </div>

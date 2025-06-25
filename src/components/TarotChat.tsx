@@ -11,6 +11,7 @@ interface TarotChatProps {
   className?: string;
   readingId?: string;
   onRateLimitExceeded?: (type: "message") => void;
+  onPremiumClick?: () => void;
 }
 
 export const TarotChat = ({
@@ -18,6 +19,7 @@ export const TarotChat = ({
   className = "",
   readingId,
   onRateLimitExceeded,
+  onPremiumClick,
 }: TarotChatProps) => {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
@@ -30,8 +32,28 @@ export const TarotChat = ({
 
   const [currentMessage, setCurrentMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [, setTick] = useState(0);
 
-  const { canSendMessage, registerMessage } = useRateLimits();
+  const {
+    canSendMessage,
+    registerMessage,
+    getTimeUntilNextMessage,
+    formatTimeLeft,
+  } = useRateLimits();
+
+  // Обновляем время каждую секунду для живого таймера
+  useState(() => {
+    const interval = setInterval(() => {
+      setTick((prev) => prev + 1);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  });
+
+  const timeUntilNextMessage = readingId
+    ? getTimeUntilNextMessage(readingId)
+    : 0;
+  const canSend = !readingId || canSendMessage(readingId);
 
   const sendMessage = async () => {
     if (!currentMessage.trim() || isLoading) return;
@@ -159,22 +181,58 @@ export const TarotChat = ({
 
       {/* Поле ввода */}
       <div className="border-t border-purple-400/30 p-4">
+        {/* Блок с информацией о лимитах и Premium кнопкой */}
+        {onPremiumClick && (
+          <div className="mb-3 p-3 bg-purple-900/30 border border-purple-400/30 rounded-lg text-center">
+            {!canSend && timeUntilNextMessage > 0 ? (
+              <>
+                <p className="text-purple-300 text-sm mb-1">
+                  Следующее сообщение будет доступно через:
+                </p>
+                <p className="text-white font-mono text-lg">
+                  {formatTimeLeft(timeUntilNextMessage)}
+                </p>
+                <p className="text-purple-400 text-xs mt-1 mb-2">
+                  Астральная энергия восстанавливается...
+                </p>
+              </>
+            ) : (
+              <p className="text-purple-300 text-sm mb-2">
+                Получите неограниченный доступ к сообщениям
+              </p>
+            )}
+            <Button
+              onClick={onPremiumClick}
+              size="sm"
+              className="bg-gradient-to-r from-yellow-600 to-orange-600 text-white text-xs px-3 py-1 hover:from-yellow-500 hover:to-orange-500 transition-all"
+            >
+              ✨ Premium
+            </Button>
+          </div>
+        )}
+
         <div className="flex flex-col lg:flex-row items-center justify-center gap-4">
           <textarea
             value={currentMessage}
             onChange={(e) => setCurrentMessage(e.target.value)}
             onKeyDown={handleKeyPress}
-            placeholder="Задайте вопрос гадалке..."
-            className="flex-1 w-full lg:w-auto bg-black/60 border border-purple-400/30 rounded-lg px-3 py-2 text-white placeholder-purple-300/50 resize-none focus:outline-none focus:border-purple-400"
+            placeholder={
+              canSend
+                ? "Задайте вопрос гадалке..."
+                : "Ожидайте восстановления энергии..."
+            }
+            className="flex-1 w-full lg:w-auto bg-black/60 border border-purple-400/30 rounded-lg px-3 py-2 text-white placeholder-purple-300/50 resize-none focus:outline-none focus:border-purple-400 disabled:opacity-50"
             rows={2}
-            disabled={isLoading}
+            disabled={isLoading || !canSend}
           />
           <Button
             onClick={sendMessage}
-            disabled={!currentMessage.trim() || isLoading}
-            className="px-6 py-2 "
+            disabled={!currentMessage.trim() || isLoading || !canSend}
+            className={`px-6 py-2 ${
+              !canSend ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
-            {isLoading ? "..." : "Спросить"}
+            {isLoading ? "..." : canSend ? "Спросить" : "Ожидание..."}
           </Button>
         </div>
       </div>

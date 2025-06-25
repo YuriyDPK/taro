@@ -65,7 +65,7 @@ export const PremiumModal = ({
         {/* Крестик для закрытия */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors z-10"
+          className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors z-10 cursor-pointer"
         >
           <svg
             className="w-6 h-6"
@@ -83,16 +83,20 @@ export const PremiumModal = ({
         </button>
 
         <div className="text-center mb-6">
-          <div className="text-4xl mb-4">⏰</div>
+          <div className="text-4xl mb-4">{timeLeft > 0 ? "⏰" : "✨"}</div>
           <h2 className="text-2xl font-medium text-white mb-2">
-            {isReading
-              ? "Лимит раскладов исчерпан"
-              : "Лимит сообщений исчерпан"}
+            {timeLeft > 0
+              ? isReading
+                ? "Лимит раскладов исчерпан"
+                : "Лимит сообщений исчерпан"
+              : "Premium доступ"}
           </h2>
           <p className="text-white/70 text-sm">
-            {isReading
-              ? `Следующий расклад будет доступен через ${formattedTime}`
-              : `Следующее сообщение будет доступно через ${formattedTime}`}
+            {timeLeft > 0
+              ? isReading
+                ? `Следующий расклад будет доступен через ${formattedTime}`
+                : `Следующее сообщение будет доступно через ${formattedTime}`
+              : "Получите неограниченный доступ ко всем функциям"}
           </p>
           {timeLeft > 0 && (
             <div className="mt-2 text-purple-300 text-xs">
