@@ -45,11 +45,11 @@ export default function SpreadsPage() {
   // Лимиты на расклады и сообщения
   const {
     canCreateReading,
-    canSendMessage,
+    // canSendMessage,
     getTimeUntilNextReading,
     getTimeUntilNextMessage,
     registerReading,
-    registerMessage,
+    // registerMessage,
   } = useRateLimits();
 
   const categories = [
@@ -65,7 +65,7 @@ export default function SpreadsPage() {
   const startReading = (spread: TarotSpreadType) => {
     // Проверяем лимит на расклады
     if (!canCreateReading()) {
-      const timeLeft = getTimeUntilNextReading();
+      // const timeLeft = getTimeUntilNextReading();
       setPremiumModalType("reading");
       setShowPremiumModal(true);
       return;
