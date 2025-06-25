@@ -6,7 +6,7 @@ import { DonationBlock } from "@/components/DonationBlock";
 
 export default function Home() {
   return (
-    <div className="flex flex-col items-center justify-center mt-[20vh] gap-[60px]">
+    <div className="flex flex-col items-center justify-center mt-[5vh] gap-[60px]">
       <div className="flex flex-col items-center justify-center gap-2">
         <h1
           className={`xl:text-[100px] lg:text-[80px] sm:text-[60px] text-[40px] font-light text-white text-center `}
