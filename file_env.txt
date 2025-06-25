@@ -1,0 +1,24 @@
+# Конфигурация для Таро приложения
+# Скопируйте этот файл в .env.local для использования
+
+# API конфигурация для GPT
+NEXT_PUBLIC_OPENAI_BASE_URL=https://api.zeroeval.com/proxy
+NEXT_PUBLIC_OPENAI_API_KEY=sk_ze_t1aM6TO4tvOq-NYn14Xm7HznuinuYQV_o8FVtOZdcb8
+NEXT_PUBLIC_OPENAI_MODEL=openai/gpt-4.1-mini-2025-04-14
+
+# Настройки приложения
+NEXT_PUBLIC_APP_NAME=Императрица
+NEXT_PUBLIC_APP_DESCRIPTION=Интерактивный сайт для проведения раскладов карт Таро
+
+# Настройки localStorage ключей
+NEXT_PUBLIC_STORAGE_KEY_READINGS=tarot-readings
+NEXT_PUBLIC_STORAGE_KEY_SETTINGS=tarot-settings
+
+# Настройки гадалки
+NEXT_PUBLIC_FORTUNE_TELLER_NAME=Асхат
+NEXT_PUBLIC_FORTUNE_TELLER_GREETING=🌟 Приветствую тебя, дитя света! Я Асхат, твоя проводница в мир таинственных карт Таро.
+
+# Настройки анимаций (в миллисекундах)
+NEXT_PUBLIC_CARD_FLIP_DURATION=800
+NEXT_PUBLIC_CARD_REVEAL_DELAY=200
+NEXT_PUBLIC_CHAT_RESPONSE_DELAY=1000 
