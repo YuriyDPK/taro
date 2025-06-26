@@ -107,12 +107,12 @@ export const Header = () => {
               >
                 💝 Благодарность
               </Link>
-            </nav>
 
-            {/* Auth in mobile menu */}
-            <div className="p-6 border-t border-purple-400/30">
-              <SignInButton />
-            </div>
+              {/* Auth кнопка под пунктами меню */}
+              <div className="border-b border-purple-400/30 pb-4">
+                <SignInButton />
+              </div>
+            </nav>
 
             {/* Footer text in mobile menu */}
             <div className="p-6 text-center text-white/60 text-sm border-t border-purple-400/30">
