@@ -50,11 +50,11 @@ export const TarotCard = ({
       {/* Название позиции */}
       {positionName && (
         <div className="text-center px-2">
-          <div className="text-sm sm:text-base md:text-lg xl:text-xl font-medium text-white mb-1">
+          <div className="text-[20px] sm:text-base md:text-lg xl:text-xl font-medium text-white mb-1">
             {positionName}
           </div>
           {positionDescription && (
-            <div className="text-xs sm:text-sm xl:text-base text-white/70 text-center max-w-24 sm:max-w-28 md:max-w-32 xl:max-w-48">
+            <div className="text-[14px] sm:text-sm xl:text-base text-white/70 text-center max-w-full sm:max-w-24 md:max-w-32 xl:max-w-48">
               {positionDescription}
             </div>
           )}
@@ -64,7 +64,7 @@ export const TarotCard = ({
       {/* Карта */}
       <div
         className={`
-          relative w-24 h-36 sm:w-28 sm:h-42 md:w-32 md:h-48 lg:w-36 lg:h-52 xl:w-48 xl:h-72
+          relative w-34 h-52 sm:w-28 sm:h-42 md:w-32 md:h-48 lg:w-36 lg:h-52 xl:w-48 xl:h-72
           cursor-pointer transition-all duration-500
           hover:scale-105 hover:z-10
           ${shouldShowCard ? "" : "hover:shadow-lg hover:shadow-purple-500/30"}
@@ -121,7 +121,7 @@ export const TarotCard = ({
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
                 <div className="absolute bottom-1 sm:bottom-2 left-1 sm:left-2 right-1 sm:right-2 text-white">
-                  <div className="text-xs sm:text-sm xl:text-base font-medium text-center bg-black/60 rounded px-1 sm:px-2 py-1 backdrop-blur-sm">
+                  <div className="text-[14px] sm:text-sm xl:text-base font-medium text-center bg-black/60 rounded px-1 sm:px-2 py-1 backdrop-blur-sm">
                     {card.name}
                   </div>
                 </div>
@@ -134,13 +134,15 @@ export const TarotCard = ({
       {/* Подсказка о клике */}
       {shouldShowCard && card && showInfo && (
         <div className="w-full max-w-48 sm:max-w-56 md:max-w-64 bg-black/80 backdrop-blur-sm rounded-lg p-2 text-white text-sm animate-slideInUp border border-purple-400/30">
-          <div className="font-medium mb-1 text-center text-purple-300 text-xs sm:text-sm">
+          <div className="font-medium mb-1 text-center text-purple-300 text-[14px] sm:text-sm">
             {card.name}
             {card.isReversed && (
-              <span className="text-red-400 text-xs ml-1">(Перевернутая)</span>
+              <span className="text-red-400 text-[14px] ml-1">
+                (Перевернутая)
+              </span>
             )}
           </div>
-          <div className="text-xs text-center text-white/70">
+          <div className="text-[12px] text-center text-white/70">
             Нажмите для подробностей
           </div>
         </div>

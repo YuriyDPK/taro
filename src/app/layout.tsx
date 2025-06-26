@@ -26,7 +26,7 @@ export default function RootLayout({
         <NextAuthProvider>
           <QueryClientProviderApp>
             <div
-              className={`flex flex-col min-h-screen px-10 py-8 bg-black ${roboto.className} bg-[#2A2641] bg-cover bg-center bg-no-repeat`}
+              className={`flex flex-col min-h-screen px-0 lg:px-10 py-8 bg-black ${roboto.className} bg-[#2A2641] bg-cover bg-center bg-no-repeat`}
               style={{ backgroundImage: `url(${bg})` }}
             >
               <Header />

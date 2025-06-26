@@ -18,7 +18,7 @@ export const Header = () => {
 
   return (
     <header className="relative z-40">
-      <div className="flex justify-between items-center lg:w-[80%] mx-auto p-4">
+      <div className="flex justify-between items-center lg:w-[80%] mx-auto p-4 px-8 lg:px-0 gap-4">
         <div className="flex items-center gap-2">
           <Link
             href="/"

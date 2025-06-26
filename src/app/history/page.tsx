@@ -428,8 +428,8 @@ export default function HistoryPage() {
                             })
                           }
                         >
-                          <div className="flex gap-4">
-                            <div className="relative w-16 h-24 flex-shrink-0">
+                          <div className="flex flex-col xl:flex-row items-center xl:items-start gap-4">
+                            <div className="relative w-24 h-38 flex-shrink-0 ">
                               <Image
                                 src={card.image}
                                 alt={card.name}
