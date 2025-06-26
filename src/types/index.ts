@@ -67,3 +67,39 @@ export type TarotSpreadType = {
     y: number;
   }>;
 };
+
+// Типы для базы данных
+export type DbTarotReading = {
+  id: string;
+  userId: string;
+  spreadType: string;
+  question?: string | null;
+  category: string;
+  cards: any; // JSON
+  createdAt: Date;
+  updatedAt: Date;
+  messages: DbChatMessage[];
+};
+
+export type DbChatMessage = {
+  id: string;
+  userId: string;
+  readingId: string;
+  content: string;
+  isUser: boolean;
+  createdAt: Date;
+};
+
+export type DbUser = {
+  id: string;
+  name?: string | null;
+  email: string;
+  emailVerified?: Date | null;
+  image?: string | null;
+  isPremium: boolean;
+  premiumExpiry?: Date | null;
+  lastReadingAt?: Date | null;
+  readingsCount: number;
+  createdAt: Date;
+  updatedAt: Date;
+};

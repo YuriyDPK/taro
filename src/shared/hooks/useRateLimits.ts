@@ -1,4 +1,5 @@
 import { useCallback } from "react";
+import { useSession } from "next-auth/react";
 import { useLocalStorage } from "./useLocalStorage";
 
 interface RateLimit {
@@ -13,6 +14,7 @@ interface ReadingLimit {
 }
 
 export const useRateLimits = () => {
+  const { data: session } = useSession();
   const [readingLimits, setReadingLimits] = useLocalStorage<ReadingLimit[]>(
     "reading-limits",
     []
@@ -21,8 +23,14 @@ export const useRateLimits = () => {
     Record<string, RateLimit>
   >("message-limits", {});
 
+  // Проверяем, является ли пользователь премиум
+  const isPremium = session?.user?.isPremium || false;
+
   // Проверка лимита на расклады (1 расклад в 30 секунд)
   const canCreateReading = useCallback(() => {
+    // Premium пользователи могут создавать расклады без ограничений
+    if (isPremium) return true;
+
     const now = Date.now();
     const fiveMinutes = 1 * 60 * 1000;
 
@@ -33,11 +41,14 @@ export const useRateLimits = () => {
     if (!lastReading) return true;
 
     return now - lastReading.lastReading >= fiveMinutes;
-  }, [readingLimits]);
+  }, [readingLimits, isPremium]);
 
   // Проверка лимита на сообщения в раскладе (1 сообщение в 30 секунд)
   const canSendMessage = useCallback(
     (readingId: string) => {
+      // Premium пользователи могут отправлять сообщения без ограничений
+      if (isPremium) return true;
+
       const now = Date.now();
       const fiveMinutes = 1 * 60 * 1000;
 
@@ -49,11 +60,14 @@ export const useRateLimits = () => {
 
       return now - messageLimit.lastAction >= fiveMinutes;
     },
-    [readingLimits, messageLimits]
+    [readingLimits, messageLimits, isPremium]
   );
 
   // Получение времени до следующего расклада
   const getTimeUntilNextReading = useCallback(() => {
+    // Premium пользователи не имеют ограничений по времени
+    if (isPremium) return 0;
+
     const now = Date.now();
     const fiveMinutes = 1 * 60 * 1000;
 
@@ -67,11 +81,14 @@ export const useRateLimits = () => {
     const timeLeft = fiveMinutes - timePassed;
 
     return Math.max(0, timeLeft);
-  }, [readingLimits]);
+  }, [readingLimits, isPremium]);
 
   // Получение времени до следующего сообщения
   const getTimeUntilNextMessage = useCallback(
     (readingId: string) => {
+      // Premium пользователи не имеют ограничений по времени
+      if (isPremium) return 0;
+
       const now = Date.now();
       const fiveMinutes = 1 * 60 * 1000;
 
@@ -83,7 +100,7 @@ export const useRateLimits = () => {
 
       return Math.max(0, timeLeft);
     },
-    [messageLimits]
+    [messageLimits, isPremium]
   );
 
   // Регистрация нового расклада
@@ -130,6 +147,9 @@ export const useRateLimits = () => {
   // Проверка наличия активных лимитов
   const hasActiveMessageLimit = useCallback(
     (readingId: string) => {
+      // Premium пользователи не имеют активных лимитов
+      if (isPremium) return false;
+
       const messageLimit = messageLimits[readingId];
       if (!messageLimit) return false;
 
@@ -139,7 +159,7 @@ export const useRateLimits = () => {
 
       return timePassed < fiveMinutes;
     },
-    [messageLimits]
+    [messageLimits, isPremium]
   );
 
   // Форматирование времени ожидания

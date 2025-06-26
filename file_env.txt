@@ -6,6 +6,17 @@ NEXT_PUBLIC_OPENAI_BASE_URL=https://api.zeroeval.com/proxy
 NEXT_PUBLIC_OPENAI_API_KEY=sk_ze_t1aM6TO4tvOq-NYn14Xm7HznuinuYQV_o8FVtOZdcb8
 NEXT_PUBLIC_OPENAI_MODEL=openai/gpt-4.1-mini-2025-04-14
 
+# База данных MySQL
+DATABASE_URL="mysql://taro_user:taro_password_123@localhost:3306/taro_db"
+
+# NextAuth.js конфигурация
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=your-super-secret-key-change-this-in-production
+
+# Google OAuth
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+
 # Настройки приложения
 NEXT_PUBLIC_APP_NAME=Императрица
 NEXT_PUBLIC_APP_DESCRIPTION=Интерактивный сайт для проведения раскладов карт Таро

@@ -1,20 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 import { Button } from "@/shared/ui/button";
 import { TarotChat } from "@/components/TarotChat";
 import TarotCardModal from "@/components/TarotCardModal";
 import { PremiumModal } from "@/components/PremiumModal";
-import { useLocalStorage } from "@/shared/hooks/useLocalStorage";
 import { useRateLimits } from "@/shared/hooks/useRateLimits";
-import { TarotReading, TarotCardDeck } from "@/types";
+import { TarotReading, TarotCardDeck, DbTarotReading } from "@/types";
 import Image from "next/image";
 
 export default function HistoryPage() {
-  const [readings, setReadings] = useLocalStorage<TarotReading[]>(
-    "tarot-readings",
-    []
-  );
+  const { data: session, status } = useSession();
+  const [readings, setReadings] = useState<TarotReading[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedReading, setSelectedReading] = useState<TarotReading | null>(
     null
   );
@@ -26,22 +25,96 @@ export default function HistoryPage() {
 
   const { getTimeUntilNextMessage } = useRateLimits();
 
-  const deleteReading = (readingId: string) => {
-    setReadings((prev) => prev.filter((reading) => reading.id !== readingId));
-    if (selectedReading?.id === readingId) {
-      setSelectedReading(null);
-      setActiveChats((prev) => {
-        const newChats = new Set(prev);
-        newChats.delete(readingId);
-        return newChats;
-      });
+  // Загружаем расклады из БД только когда пользователь авторизован
+  useEffect(() => {
+    if (status === "authenticated") {
+      loadReadings();
+    } else if (status === "unauthenticated") {
+      setLoading(false);
+    }
+  }, [status]);
+
+  const loadReadings = async () => {
+    try {
+      const response = await fetch("/api/readings");
+      if (response.ok) {
+        const dbReadings: DbTarotReading[] = await response.json();
+
+        // Преобразуем данные из БД в формат TarotReading
+        const transformedReadings: TarotReading[] = dbReadings.map(
+          (dbReading) => ({
+            id: dbReading.id,
+            date: new Date(dbReading.createdAt).toISOString(),
+            type: dbReading.category as
+              | "love"
+              | "career"
+              | "spiritual"
+              | "general",
+            question: dbReading.question || undefined,
+            cards: Array.isArray(dbReading.cards) ? dbReading.cards : [],
+            spreadType: dbReading.spreadType,
+          })
+        );
+
+        setReadings(transformedReadings);
+      } else {
+        console.error("Ошибка загрузки раскладов");
+      }
+    } catch (error) {
+      console.error("Ошибка загрузки раскладов:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const clearAllHistory = () => {
-    setReadings([]);
-    setSelectedReading(null);
-    setActiveChats(new Set());
+  const deleteReading = async (readingId: string) => {
+    try {
+      const response = await fetch(`/api/readings/${readingId}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        setReadings((prev) =>
+          prev.filter((reading) => reading.id !== readingId)
+        );
+        if (selectedReading?.id === readingId) {
+          setSelectedReading(null);
+          setActiveChats((prev) => {
+            const newChats = new Set(prev);
+            newChats.delete(readingId);
+            return newChats;
+          });
+        }
+      } else {
+        console.error("Ошибка удаления расклада");
+        alert("Ошибка удаления расклада");
+      }
+    } catch (error) {
+      console.error("Ошибка удаления расклада:", error);
+      alert("Ошибка удаления расклада");
+    }
+  };
+
+  const clearAllHistory = async () => {
+    if (!confirm("Вы уверены, что хотите удалить всю историю раскладов?")) {
+      return;
+    }
+
+    try {
+      // Удаляем все расклады пользователя из БД
+      for (const reading of readings) {
+        await fetch(`/api/readings/${reading.id}`, {
+          method: "DELETE",
+        });
+      }
+
+      setReadings([]);
+      setSelectedReading(null);
+      setActiveChats(new Set());
+    } catch (error) {
+      console.error("Ошибка очистки истории:", error);
+      alert("Ошибка очистки истории");
+    }
   };
 
   const toggleChat = (readingId: string) => {
@@ -127,7 +200,28 @@ export default function HistoryPage() {
           </p>
         </div>
 
-        {readings.length === 0 ? (
+        {status === "loading" || loading ? (
+          <div className="text-center py-16">
+            <div className="text-6xl mb-4">🔮</div>
+            <div className="text-2xl text-white/70 mb-4">
+              Загружаем вашу историю раскладов...
+            </div>
+          </div>
+        ) : status === "unauthenticated" ? (
+          <div className="text-center py-16">
+            <div className="text-6xl mb-4">🔒</div>
+            <div className="text-2xl text-white/70 mb-4">
+              Войдите в аккаунт, чтобы просмотреть историю раскладов
+            </div>
+            <Button
+              onClick={() => (window.location.href = "/spreads")}
+              className="bg-gradient-to-r from-purple-600 to-indigo-600"
+              size="lg"
+            >
+              Перейти к раскладам
+            </Button>
+          </div>
+        ) : readings.length === 0 ? (
           <div className="text-center py-16">
             <div className="text-6xl mb-4">🔮</div>
             <div className="text-2xl text-white/70 mb-4">
@@ -211,9 +305,9 @@ export default function HistoryPage() {
                         {reading.spreadType}
                       </div>
                       <button
-                        onClick={(e) => {
+                        onClick={async (e) => {
                           e.stopPropagation();
-                          deleteReading(reading.id);
+                          await deleteReading(reading.id);
                         }}
                         className="text-red-400 hover:text-red-300 text-sm"
                       >
@@ -256,7 +350,7 @@ export default function HistoryPage() {
                   {/* Информация о раскладе */}
                   <div className="bg-black/40 backdrop-blur-sm border border-purple-400/30 rounded-lg p-6">
                     <div className="flex flex-col lg:flex-row justify-between items-start mb-4">
-                      <div>
+                      <div className="mb-2">
                         <h2 className="text-2xl font-light text-white mb-2">
                           {selectedReading.spreadType}
                         </h2>
@@ -279,7 +373,9 @@ export default function HistoryPage() {
                             : "Пообщаться с гадалкой"}
                         </Button>
                         <Button
-                          onClick={() => deleteReading(selectedReading.id)}
+                          onClick={async () =>
+                            await deleteReading(selectedReading.id)
+                          }
                           variant="destructive"
                           size="sm"
                         >

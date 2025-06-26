@@ -1,15 +1,16 @@
 "use client";
 
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 import { Button } from "@/shared/ui/button";
 import { TarotCard } from "@/components/TarotCard";
 import TarotCardModal from "@/components/TarotCardModal";
 import { TarotChat } from "@/components/TarotChat";
 import { DonationBlock } from "@/components/DonationBlock";
 import { PremiumModal } from "@/components/PremiumModal";
+import { AuthModal } from "@/components/auth/AuthModal";
 import { getSpreadsByCategory } from "@/shared/data/tarot-spreads";
 import { getRandomCards } from "@/shared/data/tarot-cards";
-import { useLocalStorage } from "@/shared/hooks/useLocalStorage";
 import { useRateLimits } from "@/shared/hooks/useRateLimits";
 import {
   TarotReading,
@@ -19,6 +20,7 @@ import {
 } from "@/types";
 
 export default function SpreadsPage() {
+  const { data: session, status } = useSession();
   const [selectedCategory, setSelectedCategory] = useState<ReadingType | "all">(
     "all"
   );
@@ -38,12 +40,10 @@ export default function SpreadsPage() {
   const [premiumModalType, setPremiumModalType] = useState<
     "reading" | "message"
   >("reading");
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   // Сброс расклада при каждом заходе на страницу (когда кликают в меню)
   // Состояние автоматически сбрасывается так как selectedSpread инициализируется как null
-
-  // История раскладов в localStorage
-  const [, setReadings] = useLocalStorage<TarotReading[]>("tarot-readings", []);
 
   // Лимиты на расклады и сообщения
   const {
@@ -64,7 +64,19 @@ export default function SpreadsPage() {
 
   const availableSpreads = getSpreadsByCategory(selectedCategory);
 
-  const startReading = (spread: TarotSpreadType) => {
+  const startReading = async (spread: TarotSpreadType) => {
+    // Проверяем авторизацию
+    if (!session?.user) {
+      setShowAuthModal(true);
+      return;
+    }
+
+    // Проверяем что введен вопрос
+    if (!question.trim()) {
+      alert("Пожалуйста, сформулируйте свой вопрос перед началом расклада");
+      return;
+    }
+
     // Проверяем лимит на расклады
     if (!canCreateReading()) {
       // const timeLeft = getTimeUntilNextReading();
@@ -74,33 +86,70 @@ export default function SpreadsPage() {
     }
 
     const cards = getRandomCards(spread.cardCount);
-    const readingId = `reading-${Date.now()}`;
 
     setSelectedSpread(spread);
     setDrawnCards(cards);
     setRevealedCards([]);
     setShowChat(false);
 
-    const newReading: TarotReading = {
-      id: readingId,
-      date: new Date().toISOString(),
-      type: spread.category,
-      question: question || "Общий вопрос",
-      cards: cards.map((card, index) => ({
-        id: index,
-        name: card.name,
-        image: card.image,
-        description: spread.positions[index]?.description || "",
-        meaning: card.meaning,
-        isReversed: Math.random() < 0.3,
-      })),
-      spreadType: spread.name,
-    };
+    try {
+      // Создаем расклад в БД
+      const response = await fetch("/api/readings", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          spreadType: spread.name,
+          question: question.trim(),
+          category: spread.category,
+          cards: cards.map((card, index) => ({
+            id: index,
+            name: card.name,
+            image: card.image,
+            description: spread.positions[index]?.description || "",
+            meaning: card.meaning,
+            isReversed: Math.random() < 0.3,
+          })),
+        }),
+      });
 
-    setCurrentReading(newReading);
+      if (!response.ok) {
+        const error = await response.json();
+        if (response.status === 429) {
+          setPremiumModalType("reading");
+          setShowPremiumModal(true);
+          return;
+        }
+        throw new Error(error.error || "Ошибка создания расклада");
+      }
 
-    // Регистрируем новый расклад в лимитах
-    registerReading(readingId);
+      const dbReading = await response.json();
+
+      const newReading: TarotReading = {
+        id: dbReading.id,
+        date: new Date(dbReading.createdAt).toISOString(),
+        type: spread.category,
+        question: question.trim(),
+        cards: cards.map((card, index) => ({
+          id: index,
+          name: card.name,
+          image: card.image,
+          description: spread.positions[index]?.description || "",
+          meaning: card.meaning,
+          isReversed: Math.random() < 0.3,
+        })),
+        spreadType: spread.name,
+      };
+
+      setCurrentReading(newReading);
+
+      // Регистрируем новый расклад в лимитах
+      registerReading(dbReading.id);
+    } catch (error) {
+      console.error("Ошибка создания расклада:", error);
+      alert("Ошибка создания расклада. Попробуйте позже.");
+    }
   };
 
   const revealCard = (cardIndex: number) => {
@@ -111,10 +160,7 @@ export default function SpreadsPage() {
       setTimeout(() => {
         setShowChat(true);
 
-        // Сохраняем расклад в историю
-        if (currentReading) {
-          setReadings((prev) => [currentReading, ...prev]);
-        }
+        // Расклад уже сохранен в БД при создании
       }, 1000);
     }
   };
@@ -187,10 +233,24 @@ export default function SpreadsPage() {
               <textarea
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
-                placeholder="Сформулируйте свой вопрос (необязательно)..."
-                className="w-full bg-black/40 border border-purple-400/30 rounded-lg px-4 py-3 text-white placeholder-purple-300/50 resize-none focus:outline-none focus:border-purple-400"
+                placeholder="Сформулируйте свой вопрос (обязательно)..."
+                className={`w-full bg-black/40 border rounded-lg px-4 py-3 text-white placeholder-purple-300/50 resize-none focus:outline-none ${
+                  question.trim()
+                    ? "border-purple-400/30 focus:border-purple-400"
+                    : "border-red-400/50 focus:border-red-400"
+                }`}
                 rows={3}
               />
+              {!session?.user ? (
+                <p className="text-yellow-400 text-sm mt-2 text-center">
+                  🔒 Войдите в аккаунт, чтобы создавать расклады
+                </p>
+              ) : !question.trim() ? (
+                <p className="text-red-400 text-sm mt-2 text-center">
+                  💭 Пожалуйста, сформулируйте свой вопрос перед началом
+                  расклада
+                </p>
+              ) : null}
             </div>
 
             {/* Категории */}
@@ -219,11 +279,21 @@ export default function SpreadsPage() {
               {availableSpreads.map((spread) => (
                 <div
                   key={spread.id}
-                  className="bg-black/40 backdrop-blur-sm border border-purple-400/30 rounded-lg p-6 hover:border-purple-400/60 transition-all cursor-pointer group"
+                  className={`bg-black/40 backdrop-blur-sm border rounded-lg p-6 transition-all group ${
+                    session?.user && question.trim()
+                      ? "border-purple-400/30 hover:border-purple-400/60 cursor-pointer"
+                      : "border-gray-600/30 opacity-50 cursor-not-allowed"
+                  }`}
                   onClick={() => startReading(spread)}
                 >
                   <div className="text-center">
-                    <h3 className="text-xl font-medium text-white mb-2 group-hover:text-purple-300 transition-colors">
+                    <h3
+                      className={`text-xl font-medium mb-2 transition-colors ${
+                        session?.user && question.trim()
+                          ? "text-white group-hover:text-purple-300"
+                          : "text-gray-400"
+                      }`}
+                    >
                       {spread.name}
                     </h3>
                     <p className="text-sm text-white/70 mb-4">
@@ -384,6 +454,12 @@ export default function SpreadsPage() {
                 : 0;
             }
           }}
+        />
+
+        {/* Модальное окно авторизации */}
+        <AuthModal
+          isOpen={showAuthModal}
+          onClose={() => setShowAuthModal(false)}
         />
       </div>
     </div>

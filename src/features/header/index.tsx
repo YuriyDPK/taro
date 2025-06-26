@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
+import { SignInButton } from "@/components/auth/SignInButton";
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -48,6 +49,7 @@ export const Header = () => {
           >
             Благодарность
           </Link>
+          <SignInButton />
         </nav>
 
         {/* Mobile Menu Button */}
@@ -106,6 +108,11 @@ export const Header = () => {
                 💝 Благодарность
               </Link>
             </nav>
+
+            {/* Auth in mobile menu */}
+            <div className="p-6 border-t border-purple-400/30">
+              <SignInButton />
+            </div>
 
             {/* Footer text in mobile menu */}
             <div className="p-6 text-center text-white/60 text-sm border-t border-purple-400/30">

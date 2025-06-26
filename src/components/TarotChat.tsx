@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 import { Button } from "@/shared/ui/button";
 import { ChatMessage } from "@/types";
 import { getTarotReadingStream } from "@/shared/api/gpt";
@@ -21,6 +22,7 @@ export const TarotChat = ({
   onRateLimitExceeded,
   onPremiumClick,
 }: TarotChatProps) => {
+  const { data: session } = useSession();
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: "welcome",
@@ -33,6 +35,7 @@ export const TarotChat = ({
   const [currentMessage, setCurrentMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [, setTick] = useState(0);
+  const [messagesLoaded, setMessagesLoaded] = useState(false);
 
   const {
     canSendMessage,
@@ -41,14 +44,47 @@ export const TarotChat = ({
     formatTimeLeft,
   } = useRateLimits();
 
+  // Загружаем существующие сообщения из БД
+  useEffect(() => {
+    if (readingId && !messagesLoaded) {
+      loadMessages();
+    }
+  }, [readingId, messagesLoaded]);
+
   // Обновляем время каждую секунду для живого таймера
-  useState(() => {
+  useEffect(() => {
     const interval = setInterval(() => {
       setTick((prev) => prev + 1);
     }, 1000);
 
     return () => clearInterval(interval);
-  });
+  }, []);
+
+  const loadMessages = async () => {
+    if (!readingId) return;
+
+    try {
+      const response = await fetch(`/api/readings/${readingId}/messages`);
+      if (response.ok) {
+        const dbMessages = await response.json();
+        const loadedMessages = dbMessages.map((msg: any) => ({
+          id: msg.id,
+          text: msg.content,
+          isUser: msg.isUser,
+          timestamp: new Date(msg.createdAt).getTime(),
+        }));
+
+        setMessages((prev) => [
+          ...prev.filter((msg) => msg.id === "welcome"), // Оставляем приветствие
+          ...loadedMessages,
+        ]);
+      }
+    } catch (error) {
+      console.error("Ошибка загрузки сообщений:", error);
+    } finally {
+      setMessagesLoaded(true);
+    }
+  };
 
   const timeUntilNextMessage = readingId
     ? getTimeUntilNextMessage(readingId)
@@ -80,44 +116,84 @@ export const TarotChat = ({
       registerMessage(readingId);
     }
 
-    // Создаем сообщение для GPT с контекстом
-    const contextMessage = initialMessage
-      ? `${initialMessage}\n\nВопрос пользователя: ${currentMessage}`
-      : currentMessage;
-
-    // Создаем пустое сообщение гадалки для стрима
-    const gptMessageId = `gpt-${Date.now()}`;
-    const gptMessage: ChatMessage = {
-      id: gptMessageId,
-      text: "",
-      isUser: false,
-      timestamp: Date.now(),
-    };
-
-    setMessages((prev) => [...prev, gptMessage]);
-
     try {
-      await getTarotReadingStream(contextMessage, (chunk: string) => {
-        setMessages((prev) =>
-          prev.map((msg) =>
-            msg.id === gptMessageId
-              ? { ...msg, text: (msg.text || "") + chunk }
-              : msg
-          )
-        );
-      });
+      // Отправляем сообщение в API для сохранения в БД и получения ответа
+      if (readingId) {
+        const response = await fetch("/api/messages", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            readingId,
+            content: currentMessage,
+          }),
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          if (response.status === 429) {
+            onRateLimitExceeded?.("message");
+            return;
+          }
+          throw new Error(error.error || "Ошибка отправки сообщения");
+        }
+
+        const { userMessage, gptMessage } = await response.json();
+
+        // Добавляем сообщения в локальное состояние для отображения
+        const localUserMessage: ChatMessage = {
+          id: userMessage.id,
+          text: userMessage.content,
+          isUser: true,
+          timestamp: new Date(userMessage.createdAt).getTime(),
+        };
+
+        const localGptMessage: ChatMessage = {
+          id: gptMessage.id,
+          text: gptMessage.content,
+          isUser: false,
+          timestamp: new Date(gptMessage.createdAt).getTime(),
+        };
+
+        setMessages((prev) => [...prev, localGptMessage]);
+      } else {
+        // Fallback для случаев без readingId (не должно происходить с новым кодом)
+        const contextMessage = initialMessage
+          ? `${initialMessage}\n\nВопрос пользователя: ${currentMessage}`
+          : currentMessage;
+
+        const gptMessageId = `gpt-${Date.now()}`;
+        const gptMessage: ChatMessage = {
+          id: gptMessageId,
+          text: "",
+          isUser: false,
+          timestamp: Date.now(),
+        };
+
+        setMessages((prev) => [...prev, gptMessage]);
+
+        await getTarotReadingStream(contextMessage, (chunk: string) => {
+          setMessages((prev) =>
+            prev.map((msg) =>
+              msg.id === gptMessageId
+                ? { ...msg, text: (msg.text || "") + chunk }
+                : msg
+            )
+          );
+        });
+      }
     } catch (error) {
       console.error("Ошибка при получении ответа:", error);
-      setMessages((prev) =>
-        prev.map((msg) =>
-          msg.id === gptMessageId
-            ? {
-                ...msg,
-                text: "🌙 Простите, энергия нарушена. Попробуйте позже...",
-              }
-            : msg
-        )
-      );
+
+      const errorMessage: ChatMessage = {
+        id: `error-${Date.now()}`,
+        text: "🌙 Простите, энергия нарушена. Попробуйте позже...",
+        isUser: false,
+        timestamp: Date.now(),
+      };
+
+      setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
     }
@@ -181,8 +257,8 @@ export const TarotChat = ({
 
       {/* Поле ввода */}
       <div className="border-t border-purple-400/30 p-4">
-        {/* Блок с информацией о лимитах и Premium кнопкой */}
-        {onPremiumClick && (
+        {/* Блок с информацией о лимитах и Premium кнопкой - только для не-Premium пользователей */}
+        {onPremiumClick && !session?.user?.isPremium && (
           <div className="mb-3 p-3 bg-purple-900/30 border border-purple-400/30 rounded-lg text-center">
             {!canSend && timeUntilNextMessage > 0 ? (
               <>
@@ -208,6 +284,16 @@ export const TarotChat = ({
             >
               ✨ Premium
             </Button>
+          </div>
+        )}
+
+        {/* Информация для Premium пользователей */}
+        {session?.user?.isPremium && (
+          <div className="mb-3 p-3 bg-gradient-to-r from-yellow-900/30 to-orange-900/30 border border-yellow-400/30 rounded-lg text-center">
+            <p className="text-yellow-300 text-sm mb-1">✨ Premium активен</p>
+            <p className="text-yellow-400/80 text-xs">
+              Неограниченные сообщения и расклады
+            </p>
           </div>
         )}
 
