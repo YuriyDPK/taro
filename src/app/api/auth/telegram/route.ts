@@ -48,19 +48,17 @@ export async function POST(request: NextRequest) {
     console.log("Expected hash:", hash);
     console.log("HMAC match:", hmac === hash);
 
-    // ВРЕМЕННО ОТКЛЮЧЕНО ДЛЯ ТЕСТИРОВАНИЯ
-    // if (hmac !== hash) {
-    //   console.error("❌ HMAC verification failed");
-    //   console.error("Expected:", hash);
-    //   console.error("Calculated:", hmac);
-    //   return NextResponse.json(
-    //     { error: "Invalid Telegram auth data" },
-    //     { status: 401 }
-    //   );
-    // }
+    if (hmac !== hash) {
+      console.error("❌ HMAC verification failed");
+      console.error("Expected:", hash);
+      console.error("Calculated:", hmac);
+      return NextResponse.json(
+        { error: "Invalid Telegram auth data" },
+        { status: 401 }
+      );
+    }
 
-    console.log("⚠️ HMAC verification DISABLED for testing");
-    console.log("✅ Proceeding without HMAC check");
+    console.log("✅ HMAC verification passed");
 
     // Проверяем что данные не старше 24 часов
     const authDate = parseInt(userData.auth_date);

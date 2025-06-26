@@ -49,12 +49,11 @@ const TelegramProvider = CredentialsProvider({
       }
 
       // Проверяем подлинность данных от Telegram
-      // ВРЕМЕННО ОТКЛЮЧЕНО ДЛЯ ТЕСТИРОВАНИЯ
-      // if (!verifyTelegramAuth(credentials, botToken)) {
-      //   console.error("Invalid Telegram auth data");
-      //   return null;
-      // }
-      console.log("⚠️ HMAC verification DISABLED for testing");
+      if (!verifyTelegramAuth(credentials, botToken)) {
+        console.error("Invalid Telegram auth data");
+        return null;
+      }
+      console.log("✅ HMAC verification passed");
 
       // Проверяем что данные не старше 24 часов
       const authDate = parseInt(credentials.auth_date);
@@ -92,12 +91,85 @@ export const authOptions: NextAuthOptions = {
     TelegramProvider as any,
   ],
   callbacks: {
+    signIn: async ({ user, account, profile }) => {
+      console.log("SignIn callback:", { user, account, profile });
+
+      // Если это Telegram авторизация (Credentials provider)
+      if (account?.provider === "telegram" && user) {
+        try {
+          console.log("Processing Telegram user:", user);
+
+          // Проверяем, существует ли пользователь в БД (сначала по ID, потом по email)
+          let existingUser = await prisma.user.findUnique({
+            where: { id: user.id },
+          });
+
+          if (!existingUser) {
+            existingUser = await prisma.user.findUnique({
+              where: { email: user.email! },
+            });
+          }
+
+          if (!existingUser) {
+            console.log("Creating new Telegram user in DB");
+            try {
+              // Создаем пользователя в БД
+              const newUser = await prisma.user.create({
+                data: {
+                  id: user.id,
+                  name: user.name,
+                  email: user.email!,
+                  image: user.image,
+                  role: "user",
+                  isPremium: false,
+                },
+              });
+              console.log("New Telegram user created:", newUser);
+            } catch (createError: any) {
+              // Возможно пользователь уже был создан в другом запросе
+              console.warn(
+                "Error creating user, checking if exists:",
+                createError.message
+              );
+              existingUser = await prisma.user.findUnique({
+                where: { id: user.id },
+              });
+              if (!existingUser) {
+                throw createError;
+              }
+            }
+          } else {
+            console.log("Telegram user already exists:", existingUser);
+            // Обновляем информацию пользователя (аватарка могла измениться)
+            await prisma.user.update({
+              where: { id: existingUser.id },
+              data: {
+                name: user.name,
+                image: user.image,
+              },
+            });
+          }
+        } catch (error) {
+          console.error("Error creating/updating Telegram user:", error);
+          return false;
+        }
+      }
+
+      return true;
+    },
     session: async ({ session, token }) => {
+      console.log("Session callback:", {
+        session: session?.user,
+        token: token?.sub,
+      });
+
       if (session?.user && token?.sub) {
         // Получаем полную информацию о пользователе из базы данных
         const user = (await prisma.user.findUnique({
           where: { id: token.sub },
         })) as any;
+
+        console.log("Found user in DB:", user ? "YES" : "NO", user?.id);
 
         if (user) {
           session.user.id = user.id;
@@ -117,6 +189,28 @@ export const authOptions: NextAuthOptions = {
             });
             session.user.isPremium = false;
           }
+        } else {
+          console.error("User not found in database:", token.sub);
+          console.error("Session user:", session.user);
+
+          // Попробуем найти по email для Telegram пользователей
+          if (session.user.email?.includes("@telegram.user")) {
+            console.log(
+              "Trying to find Telegram user by email:",
+              session.user.email
+            );
+            const telegramUser = await prisma.user.findUnique({
+              where: { email: session.user.email },
+            });
+
+            if (telegramUser) {
+              console.log("Found Telegram user by email:", telegramUser.id);
+              session.user.id = telegramUser.id;
+              session.user.role = telegramUser.role;
+              session.user.isPremium = telegramUser.isPremium;
+              session.user.premiumExpiry = telegramUser.premiumExpiry;
+            }
+          }
         }
       }
       return session;
@@ -124,6 +218,8 @@ export const authOptions: NextAuthOptions = {
     jwt: async ({ user, token }) => {
       if (user) {
         token.uid = user.id;
+        // Для Telegram пользователей убеждаемся что используется правильный ID
+        token.sub = user.id;
       }
       return token;
     },
