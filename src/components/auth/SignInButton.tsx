@@ -1,8 +1,9 @@
 "use client";
 
-import { signIn, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { Button } from "@/shared/ui/button";
 import { UserDropdown } from "./UserDropdown";
+import { AuthProviderSelector } from "./AuthProviderSelector";
 
 export function SignInButton() {
   const { data: session, status } = useSession();
@@ -23,13 +24,5 @@ export function SignInButton() {
     return <UserDropdown />;
   }
 
-  return (
-    <Button
-      onClick={() => signIn("google")}
-      size="sm"
-      className="bg-black/40 border border-purple-400/30 text-purple-300 hover:text-white"
-    >
-      Войти через Google
-    </Button>
-  );
+  return <AuthProviderSelector />;
 }
