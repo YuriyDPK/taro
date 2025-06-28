@@ -413,6 +413,7 @@ export default function SpreadsPage() {
                     initialMessage={generateReadingDescription()}
                     className="h-fit max-h-[600px]"
                     readingId={currentReading?.id}
+                    questionFromReading={question}
                     onRateLimitExceeded={(type) => {
                       setPremiumModalType(type);
                       setShowPremiumModal(true);

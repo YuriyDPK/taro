@@ -3,6 +3,7 @@ import "./globals.css";
 import { QueryClientProviderApp } from "@/shared/api/query-client";
 import { Header } from "@/features/header";
 import { NextAuthProvider } from "@/components/providers/SessionProvider";
+import { CookieNotice } from "@/components/CookieNotice";
 import { Roboto } from "next/font/google";
 
 export const metadata: Metadata = {
@@ -31,6 +32,7 @@ export default function RootLayout({
             >
               <Header />
               <main className="flex-1">{children}</main>
+              <CookieNotice />
             </div>
           </QueryClientProviderApp>
         </NextAuthProvider>

@@ -171,19 +171,19 @@ export function UserDropdown() {
                       По категориям:
                     </div>
                     <div className="grid grid-cols-2 gap-2 text-xs">
-                      <div className="flex justify-between">
+                      <div className="flex justify-between text-white/70">
                         <span>❤️ Любовь:</span>
                         <span>{userStats.readingsByCategory.love}</span>
                       </div>
-                      <div className="flex justify-between">
+                      <div className="flex justify-between text-white/70">
                         <span>💼 Карьера:</span>
                         <span>{userStats.readingsByCategory.career}</span>
                       </div>
-                      <div className="flex justify-between">
+                      <div className="flex justify-between text-white/70">
                         <span>🙏 Духовность:</span>
                         <span>{userStats.readingsByCategory.spiritual}</span>
                       </div>
-                      <div className="flex justify-between">
+                      <div className="flex justify-between text-white/70">
                         <span>🔮 Общие:</span>
                         <span>{userStats.readingsByCategory.general}</span>
                       </div>

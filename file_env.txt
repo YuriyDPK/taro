@@ -17,8 +17,7 @@ NEXTAUTH_SECRET=your-super-secret-key-change-this-in-production
 GOOGLE_CLIENT_ID=your-google-client-id
 GOOGLE_CLIENT_SECRET=your-google-client-secret
 
-# Telegram OAuth
-TELEGRAM_BOT_TOKEN=your-telegram-bot-token-from-botfather
+# Telegram OAuth больше не используется
 
 # Настройки приложения
 NEXT_PUBLIC_APP_NAME=Императрица

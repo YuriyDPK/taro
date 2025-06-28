@@ -110,7 +110,7 @@ export const Header = () => {
 
               {/* Auth кнопка под пунктами меню */}
               <div className="border-b border-purple-400/30 pb-4">
-                <SignInButton />
+                <SignInButton onClose={closeMenu} />
               </div>
             </nav>
 

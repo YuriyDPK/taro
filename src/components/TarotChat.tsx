@@ -11,6 +11,7 @@ interface TarotChatProps {
   initialMessage?: string;
   className?: string;
   readingId?: string;
+  questionFromReading?: string;
   onRateLimitExceeded?: (type: "message") => void;
   onPremiumClick?: () => void;
 }
@@ -19,6 +20,7 @@ export const TarotChat = ({
   initialMessage,
   className = "",
   readingId,
+  questionFromReading,
   onRateLimitExceeded,
   onPremiumClick,
 }: TarotChatProps) => {
@@ -43,6 +45,13 @@ export const TarotChat = ({
     getTimeUntilNextMessage,
     formatTimeLeft,
   } = useRateLimits();
+
+  // Предзаполняем поле ввода вопросом из расклада
+  useEffect(() => {
+    if (questionFromReading && !currentMessage) {
+      setCurrentMessage(questionFromReading);
+    }
+  }, [questionFromReading]);
 
   // Загружаем существующие сообщения из БД
   useEffect(() => {

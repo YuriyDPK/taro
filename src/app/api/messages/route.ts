@@ -4,6 +4,48 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getTarotReadingStream } from "@/shared/api/gpt";
 
+// Функция для генерации контекста расклада
+function generateReadingContext(reading: any): string {
+  const cards = Array.isArray(reading.cards) ? reading.cards : [];
+
+  let context = `🔮 Контекст расклада "${reading.spreadType}"\n`;
+
+  if (reading.question) {
+    context += `❓ Первоначальный вопрос: ${reading.question}\n`;
+  }
+
+  context += `📅 Дата расклада: ${reading.createdAt.toLocaleDateString(
+    "ru-RU"
+  )}\n\n`;
+
+  if (cards.length > 0) {
+    context += "🃏 Карты в раскладе:\n";
+    cards.forEach((card: any, index: number) => {
+      context += `\n${index + 1}. ${card.name}`;
+      if (card.description) {
+        context += ` (Позиция: ${card.description})`;
+      }
+
+      if (card.meaning) {
+        const meaning = card.isReversed
+          ? card.meaning.reversed
+          : card.meaning.upright;
+        context += `\n   Значение: ${meaning}`;
+      }
+
+      if (card.isReversed) {
+        context += "\n   Карта перевернута";
+      }
+    });
+    context += "\n";
+  }
+
+  context +=
+    "\n✨ Учитывай этот расклад при ответе на вопросы пользователя. Давай толкования с учетом выпавших карт и их позиций.\n\n";
+
+  return context;
+}
+
 // POST - отправить сообщение
 export async function POST(request: NextRequest) {
   try {
@@ -66,12 +108,16 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Получаем ответ от GPT
+    // Генерируем контекст расклада для GPT
+    const readingContext = generateReadingContext(reading);
+    const fullMessage = `${readingContext}Вопрос пользователя: ${content}`;
+
+    // Получаем ответ от GPT с контекстом расклада
     let gptResponse = "";
 
     try {
       await new Promise<void>((resolve, reject) => {
-        getTarotReadingStream(content, (chunk: string) => {
+        getTarotReadingStream(fullMessage, (chunk: string) => {
           gptResponse += chunk;
         })
           .then(() => resolve())

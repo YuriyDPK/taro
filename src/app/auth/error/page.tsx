@@ -17,11 +17,9 @@ function AuthErrorContent() {
 
     switch (errorCode) {
       case "CredentialsSignin":
-        if (provider === "telegram") {
-          setError("Ошибка авторизации через Telegram. Попробуйте еще раз.");
-        } else {
-          setError("Неверные данные для входа.");
-        }
+        setError(
+          "Неверный email или пароль. Проверьте данные и попробуйте еще раз."
+        );
         break;
       case "OAuthSignin":
         setError("Ошибка при входе через OAuth провайдер.");

@@ -51,6 +51,7 @@ model User {
   email         String    @unique
   emailVerified DateTime?
   image         String?
+  password      String?   // Хешированный пароль для обычной авторизации
   
   // Роль пользователя
   role          String    @default("user") // "user" или "admin"

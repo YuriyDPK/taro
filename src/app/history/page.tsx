@@ -404,6 +404,7 @@ export default function HistoryPage() {
                       )}
                       className="h-fit max-h-[500px]"
                       readingId={selectedReading.id}
+                      questionFromReading={selectedReading.question}
                       onRateLimitExceeded={() => setShowPremiumModal(true)}
                       onPremiumClick={() => setShowPremiumModal(true)}
                     />

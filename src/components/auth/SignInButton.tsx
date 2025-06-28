@@ -5,7 +5,7 @@ import { Button } from "@/shared/ui/button";
 import { UserDropdown } from "./UserDropdown";
 import { AuthProviderSelector } from "./AuthProviderSelector";
 
-export function SignInButton() {
+export function SignInButton({ onClose }: { onClose?: () => void }) {
   const { data: session, status } = useSession();
 
   if (status === "loading") {
@@ -27,5 +27,5 @@ export function SignInButton() {
     return <UserDropdown />;
   }
 
-  return <AuthProviderSelector />;
+  return <AuthProviderSelector onClose={onClose} />;
 }
