@@ -44,6 +44,12 @@ export const Header = () => {
             История раскладов
           </Link>
           <Link
+            href="/premium"
+            className="text-[26px] bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent font-light hover:from-yellow-300 hover:to-orange-300 transition-colors"
+          >
+            ✨ Premium
+          </Link>
+          <Link
             href="/donations"
             className="text-[26px] text-white font-light hover:text-white/90 transition-colors"
           >
@@ -99,6 +105,13 @@ export const Header = () => {
                 onClick={closeMenu}
               >
                 📜 История раскладов
+              </Link>
+              <Link
+                href="/premium"
+                className="text-2xl bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent font-light hover:from-yellow-300 hover:to-orange-300 transition-colors border-b border-purple-400/30 pb-4"
+                onClick={closeMenu}
+              >
+                ✨ Premium доступ
               </Link>
               <Link
                 href="/donations"

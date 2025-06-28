@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/shared/ui/button";
 import { DonationBlock } from "./DonationBlock";
+import Link from "next/link";
 
 interface PremiumModalProps {
   isOpen: boolean;
@@ -130,11 +131,20 @@ export const PremiumModal = ({
             </div>
           </div>
 
-          <div className="text-center ">
+          {/* Кнопка перехода к премиуму */}
+          <div className="text-center">
+            <Link href="/premium">
+              <Button
+                onClick={onClose}
+                className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-medium mb-4"
+              >
+                🔮 Выбрать тариф Premium
+              </Button>
+            </Link>
             <p className="text-purple-300 text-sm mb-4">
-              Поддержите проект и получите неограниченный доступ
+              Или поддержите проект любой суммой
             </p>
-            <DonationBlock className=" " />
+            <DonationBlock className="" />
           </div>
 
           <div className="text-center text-xs text-white/50">

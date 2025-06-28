@@ -4,6 +4,7 @@ import { useState, Suspense } from "react";
 import { signIn, getSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/shared/ui/button";
+import { GoogleIcon } from "@/shared/ui/icons/GoogleIcon";
 
 function SignInForm() {
   const [isRegistering, setIsRegistering] = useState(false);
@@ -85,7 +86,7 @@ function SignInForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 px-4">
+    <div className="min-h-screen flex items-center justify-center px-4">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <h2 className="text-3xl font-bold text-white">
@@ -153,7 +154,7 @@ function SignInForm() {
             <Button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-medium py-2 hover:from-purple-500 hover:to-indigo-500 transition-all"
+              className="w-full text-[20px] bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-medium py-2 hover:from-purple-500 hover:to-indigo-500 transition-all"
             >
               {isLoading
                 ? "..."
@@ -175,9 +176,10 @@ function SignInForm() {
           <Button
             onClick={handleGoogleSignIn}
             disabled={isLoading}
-            className="w-full bg-black/60 border border-purple-400/30 text-white hover:bg-purple-600/30 hover:border-purple-400 transition-all"
+            className="w-full text-[20px] bg-black/60 border border-purple-400/30 text-white hover:bg-purple-600/30 hover:border-purple-400 transition-all"
           >
-            🔑 Войти через Google
+            <GoogleIcon width={20} height={20} />
+            Войти через Google
           </Button>
 
           <div className="text-center">
