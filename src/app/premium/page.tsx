@@ -68,7 +68,14 @@ export default function PremiumPage() {
       );
       return;
     }
-
+    if (session?.user?.isPremium) {
+      alert("У вас уже активен Премиум доступ!");
+      return;
+    }
+    if (!session?.user) {
+      alert("Необходимо авторизоваться для покупки Премиум доступа");
+      return;
+    }
     // Здесь будет интеграция с платежной системой
     alert(
       `Покупка плана: ${plans[selectedPlan].price}₽ за ${plans[selectedPlan].period}`

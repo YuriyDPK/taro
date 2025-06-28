@@ -110,10 +110,11 @@ function SignInForm() {
             {isRegistering && (
               <div>
                 <label className="block text-purple-300 text-sm mb-2">
-                  Имя (необязательно)
+                  Имя*
                 </label>
                 <input
                   type="text"
+                  required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="w-full bg-black/60 border border-purple-400/30 rounded-lg px-3 py-2 text-white placeholder-purple-300/50 focus:outline-none focus:border-purple-400"

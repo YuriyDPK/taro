@@ -18,6 +18,7 @@ const buttonVariants = cva(
         default: "text-[26px] font-light px-4 py-2",
         sm: "text-sm font-light px-4 py-1.5",
         lg: "text-xl font-light px-4 py-3",
+        entry: "text-[14px] px-4 py-2",
       },
     },
     defaultVariants: {

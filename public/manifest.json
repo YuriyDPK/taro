@@ -1,0 +1,35 @@
+{
+  "name": "Таро - ключи ко всем дверям",
+  "short_name": "Таро",
+  "description": "Интерактивный сайт для проведения раскладов карт Таро. Гадание онлайн, различные расклады, толкование карт.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#2A2641",
+  "theme_color": "#2A2641",
+  "orientation": "portrait",
+  "scope": "/",
+  "lang": "ru",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["entertainment", "lifestyle", "games"],
+  "screenshots": [
+    {
+      "src": "/logo.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ]
+}
