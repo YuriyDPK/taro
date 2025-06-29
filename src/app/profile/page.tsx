@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { Button } from "@/shared/ui/button";
 import { Crown, User, Calendar, TrendingUp, BarChart3 } from "lucide-react";
+import { PremiumStatusCard } from "@/components/PremiumStatusCard";
 import Link from "next/link";
 
 interface UserStats {
@@ -178,6 +179,9 @@ export default function ProfilePage() {
             </div>
           </div>
         </div>
+
+        {/* Premium Status */}
+        <PremiumStatusCard />
 
         {/* Statistics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

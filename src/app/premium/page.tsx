@@ -61,7 +61,9 @@ export default function PremiumPage() {
     },
   ];
 
-  const handlePurchase = () => {
+  const [isCreatingPayment, setIsCreatingPayment] = useState(false);
+
+  const handlePurchase = async () => {
     if (!agreedToTerms || !agreedToPrivacy) {
       alert(
         "Необходимо согласиться с условиями использования и политикой конфиденциальности"
@@ -76,10 +78,37 @@ export default function PremiumPage() {
       alert("Необходимо авторизоваться для покупки Премиум доступа");
       return;
     }
-    // Здесь будет интеграция с платежной системой
-    alert(
-      `Покупка плана: ${plans[selectedPlan].price}₽ за ${plans[selectedPlan].period}`
-    );
+
+    setIsCreatingPayment(true);
+
+    try {
+      const response = await fetch("/api/payments/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          subscriptionType: selectedPlan === "month" ? "monthly" : "yearly",
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Сохраняем ID платежа для проверки статуса
+        localStorage.setItem("lastPaymentId", data.paymentId);
+
+        // Перенаправляем на страницу оплаты ЮKassa
+        window.location.href = data.confirmationUrl;
+      } else {
+        alert(data.error || "Ошибка создания платежа");
+      }
+    } catch (error) {
+      console.error("Ошибка:", error);
+      alert("Ошибка соединения с сервером");
+    } finally {
+      setIsCreatingPayment(false);
+    }
   };
 
   const canPurchase =
@@ -259,14 +288,21 @@ export default function PremiumPage() {
             <div className="text-center">
               <Button
                 onClick={handlePurchase}
-                disabled={!canPurchase}
+                disabled={!canPurchase || isCreatingPayment}
                 className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-medium px-8 py-3 text-lg hover:from-purple-500 hover:to-indigo-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {session?.user?.isPremium
-                  ? "Премиум уже активен"
-                  : !agreedToTerms || !agreedToPrivacy
-                  ? "Примите условия для продолжения"
-                  : `Купить за ${plans[selectedPlan].price}₽`}
+                {isCreatingPayment ? (
+                  <div className="flex items-center gap-2">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    Создание платежа...
+                  </div>
+                ) : session?.user?.isPremium ? (
+                  "Премиум уже активен"
+                ) : !agreedToTerms || !agreedToPrivacy ? (
+                  "Примите условия для продолжения"
+                ) : (
+                  `Купить за ${plans[selectedPlan].price}₽`
+                )}
               </Button>
             </div>
           </div>

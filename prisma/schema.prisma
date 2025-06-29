@@ -71,6 +71,7 @@ model User {
   messages      ChatMessage[]
   supportTickets SupportTicket[]
   supportMessages SupportMessage[]
+  payments      Payment[]
   
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -174,4 +175,23 @@ model SupportMessage {
   createdAt DateTime @default(now())
 
   @@map("support_messages")
+}
+
+// Модель для платежей
+model Payment {
+  id              String   @id // ID платежа из ЮKassa
+  userId          String
+  amount          Int      // Сумма в рублях
+  currency        String   @default("RUB")
+  status          String   // pending, waiting_for_capture, succeeded, canceled
+  subscriptionType String  // monthly, yearly
+  description     String
+  confirmationUrl String?  @db.Text
+  
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("payments")
 }

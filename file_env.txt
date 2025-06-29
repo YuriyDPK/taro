@@ -34,4 +34,13 @@ NEXT_PUBLIC_FORTUNE_TELLER_GREETING=🌟 Приветствую тебя, дит
 # Настройки анимаций (в миллисекундах)
 NEXT_PUBLIC_CARD_FLIP_DURATION=800
 NEXT_PUBLIC_CARD_REVEAL_DELAY=200
-NEXT_PUBLIC_CHAT_RESPONSE_DELAY=1000 
+NEXT_PUBLIC_CHAT_RESPONSE_DELAY=1000
+
+# ЮKassa настройки
+YOOKASSA_SHOP_ID=id
+YOOKASSA_SECRET_KEY=secret
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+# Цены для премиум подписки (в рублях)
+PREMIUM_MONTHLY_PRICE=299
+PREMIUM_YEARLY_PRICE=2500

@@ -14,6 +14,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import Link from "next/link";
+import PaymentsSection from "@/components/admin/PaymentsSection";
 
 interface AdminUser {
   id: string;
@@ -497,6 +498,9 @@ export default function AdminPage() {
             </div>
           </div>
         )}
+
+        {/* Секция платежей - отображается только в режиме списка пользователей */}
+        {!selectedUser && <PaymentsSection />}
       </div>
     </div>
   );
