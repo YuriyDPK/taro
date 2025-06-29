@@ -3,7 +3,14 @@
 import { useState, useEffect, useRef } from "react";
 import { signOut, useSession } from "next-auth/react";
 import { Button } from "@/shared/ui/button";
-import { ChevronDown, User, LogOut, Crown, Settings } from "lucide-react";
+import {
+  ChevronDown,
+  User,
+  LogOut,
+  Crown,
+  Settings,
+  HelpCircle,
+} from "lucide-react";
 import Link from "next/link";
 
 interface UserStats {
@@ -215,6 +222,13 @@ export function UserDropdown() {
               <Button className=" text-sm justify-start text-left bg-transparent border border-purple-400/30 text-purple-300 hover:text-white hover:bg-purple-600/20">
                 <User size={16} className="mr-2" />
                 Перейти в профиль
+              </Button>
+            </Link>
+
+            <Link href="/support" onClick={() => setIsOpen(false)}>
+              <Button className=" text-sm justify-start text-left bg-transparent border border-blue-400/30 text-blue-300 hover:text-white hover:bg-blue-600/20">
+                <HelpCircle size={16} className="mr-2" />
+                Техническая поддержка
               </Button>
             </Link>
 

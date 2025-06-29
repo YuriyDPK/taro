@@ -36,16 +36,12 @@ export function Footer() {
                   pronagin2@gmail.com
                 </a>
               </div>
-              <div>
-                <span className="text-purple-300">🏢 ИП:</span> Пронягин Юрий
-                Максимович
-              </div>
-              <div>
-                <span className="text-purple-300">🆔 ИНН:</span> 524926143433
-              </div>
+
               <div className="pt-2">
                 <span className="text-purple-300">🌐 Сайт:</span>{" "}
-                <span className="text-white">ashat-taro.ru</span>
+                <span className="text-white">
+                  <Link href="/">ashat-taro.ru</Link>
+                </span>
               </div>
             </div>
           </div>
@@ -82,7 +78,7 @@ export function Footer() {
             © {new Date().getFullYear()} Асхат Таро. Все права защищены.
           </p>
           <p className="text-white/50 text-xs mt-1">
-            Сервис предоставляется самозанятым ИП Пронягиным Ю.М. (ИНН:
+            Сервис предоставляется самозанятым Пронягиным Ю.М. (ИНН:
             524926143433)
           </p>
         </div>

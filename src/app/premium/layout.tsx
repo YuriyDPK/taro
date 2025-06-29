@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import Script from "next/script";
 
 export const metadata: Metadata = {
   title:
@@ -42,5 +43,64 @@ export default function PremiumLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return (
+    <>
+      <Script
+        id="premium-structured-data"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Product",
+            name: "Premium доступ к Таро",
+            description:
+              "Премиум подписка для безлимитных раскладов Таро с эксклюзивными функциями",
+            brand: {
+              "@type": "Brand",
+              name: "Таро - ключи ко всем дверям",
+            },
+            category: "Digital Service",
+            offers: {
+              "@type": "Offer",
+              priceCurrency: "RUB",
+              availability: "https://schema.org/InStock",
+              seller: {
+                "@type": "Organization",
+                name: "Таро - ключи ко всем дверям",
+              },
+            },
+            hasFeature: [
+              {
+                "@type": "PropertyValue",
+                name: "Безлимитные расклады",
+                description: "Неограниченное количество раскладов Таро",
+              },
+              {
+                "@type": "PropertyValue",
+                name: "Приоритетная поддержка",
+                description:
+                  "Быстрая техническая поддержка для Premium пользователей",
+              },
+              {
+                "@type": "PropertyValue",
+                name: "Расширенные толкования",
+                description: "Детальные интерпретации карт и раскладов",
+              },
+              {
+                "@type": "PropertyValue",
+                name: "Эксклюзивные расклады",
+                description: "Доступ к специальным типам раскладов",
+              },
+            ],
+            audience: {
+              "@type": "Audience",
+              audienceType:
+                "Premium users interested in advanced Tarot readings",
+            },
+          }),
+        }}
+      />
+      {children}
+    </>
+  );
 }

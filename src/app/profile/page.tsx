@@ -301,6 +301,11 @@ export default function ProfilePage() {
               📜 Посмотреть историю
             </Button>
           </Link>
+          <Link href="/profile/support">
+            <Button className="bg-black/40 border border-blue-400/30 text-blue-300 hover:text-white text-[16px] lg:text-lg">
+              🎫 Мои обращения в поддержку
+            </Button>
+          </Link>
           {session?.user?.role === "admin" && (
             <Link href="/admin">
               <Button className="bg-gradient-to-r from-red-600 to-pink-600 text-[16px] lg:text-lg">

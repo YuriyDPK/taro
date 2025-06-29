@@ -69,6 +69,8 @@ model User {
   sessions      Session[]
   readings      TarotReading[]
   messages      ChatMessage[]
+  supportTickets SupportTicket[]
+  supportMessages SupportMessage[]
   
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -96,6 +98,7 @@ model TarotReading {
   
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   messages    ChatMessage[]
+  supportTickets SupportTicket[]
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -128,4 +131,47 @@ model RateLimit {
   
   @@unique([userId, readingId, type])
   @@map("rate_limits")
+}
+
+// Модели для технической поддержки
+model SupportTicket {
+  id          String   @id @default(cuid())
+  userId      String?  // Может быть null для неавторизованных пользователей
+  
+  // Контактная информация (для неавторизованных)
+  guestName   String?
+  guestEmail  String?
+  guestPhone  String?
+  
+  subject     String
+  description String   @db.Text
+  status      String   @default("open") // "open", "in_progress", "resolved", "closed"
+  priority    String   @default("medium") // "low", "medium", "high", "urgent"
+  
+  // Связанное гадание (опционально)
+  readingId   String?
+  reading     TarotReading? @relation(fields: [readingId], references: [id], onDelete: SetNull)
+  
+  user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages    SupportMessage[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("support_tickets")
+}
+
+model SupportMessage {
+  id        String   @id @default(cuid())
+  ticketId  String
+  userId    String?  // null если сообщение от админа
+  content   String   @db.Text
+  isAdmin   Boolean  @default(false)
+  
+  ticket    SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  createdAt DateTime @default(now())
+
+  @@map("support_messages")
 }

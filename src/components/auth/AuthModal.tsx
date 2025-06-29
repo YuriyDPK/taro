@@ -35,7 +35,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
             <Button
               onClick={onClose}
-              className="w-full bg-black/40 border border-purple-400/30 text-purple-300 hover:text-white"
+              className="w-full bg-black/40 text-[14px] border border-purple-400/30 text-purple-300 hover:text-white"
             >
               Отмена
             </Button>

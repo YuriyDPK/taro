@@ -184,6 +184,18 @@ export default function AdminPage() {
           <p className="text-xl text-white/80">
             Управление пользователями системы
           </p>
+          <div className="mt-6 flex justify-center gap-4">
+            <Link href="/admin/support">
+              <Button className="bg-blue-600 hover:bg-blue-700">
+                🛠️ Техническая поддержка
+              </Button>
+            </Link>
+            <Link href="/">
+              <Button className="bg-purple-600 hover:bg-purple-700">
+                🏠 На главную
+              </Button>
+            </Link>
+          </div>
         </div>
 
         {!selectedUser ? (

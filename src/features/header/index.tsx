@@ -50,7 +50,13 @@ export const Header = () => {
           >
             История раскладов
           </Link>
-
+          <Link
+            href="/support"
+            className="text-[20px] text-white font-light hover:text-white/90 transition-colors"
+            aria-label="Техническая поддержка"
+          >
+            Поддержка
+          </Link>
           <Link
             href="/donations"
             className="text-[20px] text-white font-light hover:text-white/90 transition-colors"
@@ -130,6 +136,14 @@ export const Header = () => {
                 aria-label="Посмотреть историю раскладов"
               >
                 📜 История раскладов
+              </Link>
+              <Link
+                href="/support"
+                className="text-2xl text-white font-light hover:text-purple-300 transition-colors border-b border-purple-400/30 pb-4"
+                onClick={closeMenu}
+                aria-label="Техническая поддержка"
+              >
+                🛠️ Поддержка
               </Link>
               <Link
                 href="/premium"
