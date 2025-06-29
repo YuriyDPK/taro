@@ -106,7 +106,7 @@ export function UserDropdown() {
       </button>
 
       {isOpen && (
-        <div className="fixed sm:absolute top-16 sm:top-auto left-4 right-4 sm:right-0 sm:left-auto mt-0 sm:mt-2 w-auto sm:w-80 bg-black/95 backdrop-blur-sm border border-purple-400/30 rounded-lg shadow-xl z-50">
+        <div className="fixed xl:absolute top-16 xl:top-auto left-4 right-4 xl:right-0 xl:left-auto mt-0 xl:mt-2 w-auto xl:w-80 bg-black/95 backdrop-blur-sm border border-purple-400/30 rounded-lg shadow-xl z-50">
           {/* Header */}
           <div className="p-4 border-b border-purple-400/30">
             <div className="flex items-center gap-3">

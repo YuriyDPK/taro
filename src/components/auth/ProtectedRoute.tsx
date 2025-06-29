@@ -26,13 +26,12 @@ export function ProtectedRoute({ children, fallback }: ProtectedRouteProps) {
     return (
       fallback || (
         <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
-          <div className="max-w-md mx-auto">
-            <h2 className="text-2xl md:text-3xl font-light text-white mb-4">
+          <div className="max-w-md mx-auto flex flex-col items-center justify-center">
+            <h2 className="text-2xl md:text-4xl font-light text-white mb-4">
               🌟 Войдите в священное пространство
             </h2>
-            <p className="text-white/80 mb-6">
-              Чтобы получить доступ к раскладам и сохранить свою историю,
-              необходимо войти в систему через Google
+            <p className="text-white/80 mb-6 text-[18px]">
+              Чтобы получить доступ к гороскопам необходимо войти в систему.
             </p>
             <SignInButton />
           </div>

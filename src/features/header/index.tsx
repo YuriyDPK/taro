@@ -2,11 +2,15 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 import { Menu, X } from "lucide-react";
 import { SignInButton } from "@/components/auth/SignInButton";
+import { AuthModal } from "@/components/auth/AuthModal";
 
 export const Header = () => {
+  const { data: session } = useSession();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -16,9 +20,17 @@ export const Header = () => {
     setIsMenuOpen(false);
   };
 
+  const handleHoroscopeClick = (e: React.MouseEvent) => {
+    if (!session) {
+      e.preventDefault();
+      setShowAuthModal(true);
+      closeMenu();
+    }
+  };
+
   return (
     <header className="relative z-40" role="banner">
-      <div className="flex justify-between items-center lg:w-[80%] mx-auto p-4 px-8 lg:px-0 gap-4">
+      <div className="flex justify-between items-center xl:w-[80%] w-full  xl:mx-auto p-4 px-8 lg:px-0 gap-4 overflow-x-auto">
         <div className="flex items-center gap-2">
           <Link
             href="/"
@@ -42,6 +54,14 @@ export const Header = () => {
             aria-label="Перейти к раскладам Таро"
           >
             Расклады
+          </Link>
+          <Link
+            href="/horoscope"
+            onClick={handleHoroscopeClick}
+            className="text-[20px] text-white font-light hover:text-white/90 transition-colors"
+            aria-label="Гороскопы и совместимость знаков"
+          >
+            Гороскопы
           </Link>
           <Link
             href="/history"
@@ -130,6 +150,17 @@ export const Header = () => {
                 🔮 Расклады
               </Link>
               <Link
+                href="/horoscope"
+                className="text-2xl text-white font-light hover:text-purple-300 transition-colors border-b border-purple-400/30 pb-4"
+                onClick={(e) => {
+                  handleHoroscopeClick(e);
+                  closeMenu();
+                }}
+                aria-label="Гороскопы и совместимость знаков"
+              >
+                ✨ Гороскопы {!session && "🔒"}
+              </Link>
+              <Link
                 href="/history"
                 className="text-2xl text-white font-light hover:text-purple-300 transition-colors border-b border-purple-400/30 pb-4"
                 onClick={closeMenu}
@@ -175,6 +206,12 @@ export const Header = () => {
           </div>
         </div>
       )}
+
+      {/* Модальное окно авторизации */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+      />
     </header>
   );
 };
