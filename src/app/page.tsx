@@ -91,7 +91,7 @@ export default function Home() {
 
           <nav role="navigation" aria-label="Основные действия">
             <Link href="/spreads">
-              <Button className="px-[40px] lg:px-[60px] lg:py-[20px] py-[10px] text-[22px] lg:text-[28px] xl:text-[32px] shadow-white/5 shadow-[0px_-10px_10px_0px_rgba(255,255,255,0.05)] hover:scale-105 transition-transform duration-300">
+              <Button className="px-[40px] lg:px-[60px] lg:py-[20px] py-[10px] text-[26px] lg:text-[28px] xl:text-[32px] shadow-white/5 shadow-[0px_-10px_10px_0px_rgba(255,255,255,0.05)] hover:scale-105 transition-transform duration-300">
                 🔮 Сделать расклад
               </Button>
             </Link>
@@ -104,7 +104,7 @@ export default function Home() {
               onClick={handleHoroscopeClick}
               className="w-full sm:w-auto"
             >
-              <Button className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 px-8 py-4 text-lg transition-all duration-300 hover:scale-105">
+              <Button className="w-full sm:w-auto bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-700 hover:to-indigo-700 px-8 py-4 text-lg transition-all duration-300 hover:scale-105">
                 ✨ Гороскопы
                 {!session && <span className="ml-2 text-xs">🔒</span>}
               </Button>

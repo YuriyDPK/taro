@@ -151,8 +151,8 @@ export default function WeeklyHoroscopePage() {
             <div className="space-y-8">
               {/* Sign Header */}
               <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6">
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center gap-4">
+                <div className="flex flex-col lg:flex-row items-center justify-between mb-6">
+                  <div className="flex flex-col lg:flex-row items-center gap-4">
                     <div className="text-5xl">{selectedSignData.emoji}</div>
                     <div>
                       <h2 className="text-3xl font-bold text-white">

@@ -30,7 +30,7 @@ export const Header = () => {
 
   return (
     <header className="relative z-40" role="banner">
-      <div className="flex justify-between items-center xl:w-[80%] w-full  xl:mx-auto p-4 px-8 lg:px-0 gap-4 overflow-x-auto">
+      <div className="flex justify-between items-center xl:w-[80%] w-full xl:mx-auto p-4 px-8 xl:px-0 gap-4 ">
         <div className="flex items-center gap-2">
           <Link
             href="/"
@@ -44,7 +44,7 @@ export const Header = () => {
 
         {/* Desktop Navigation */}
         <nav
-          className="hidden lg:flex items-center gap-10"
+          className="hidden xl:flex items-center gap-10"
           role="navigation"
           aria-label="Основное меню"
         >
@@ -97,7 +97,7 @@ export const Header = () => {
         {/* Mobile Menu Button */}
         <button
           onClick={toggleMenu}
-          className="lg:hidden text-white p-2 rounded-md hover:bg-white/10 transition-colors"
+          className="xl:hidden text-white p-2 rounded-md hover:bg-white/10 transition-colors"
           aria-label={isMenuOpen ? "Закрыть меню" : "Открыть меню"}
           aria-expanded={isMenuOpen}
           aria-controls="mobile-menu"
@@ -109,7 +109,7 @@ export const Header = () => {
       {/* Mobile Navigation Overlay */}
       {isMenuOpen && (
         <div
-          className="lg:hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-sm"
+          className="xl:hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-sm"
           id="mobile-menu"
           role="dialog"
           aria-modal="true"

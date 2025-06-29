@@ -295,7 +295,7 @@ export default function ZodiacSignPage() {
                 ))}
               </div>
               <Link href="/horoscope/compatibility">
-                <Button className="w-full mt-4 bg-gradient-to-r from-pink-600 to-rose-600">
+                <Button className="w-full mt-4 bg-gradient-to-r from-pink-700 to-rose-700 lg:text-[22px] text-[18px]">
                   🔮 Детальная совместимость
                 </Button>
               </Link>
@@ -332,17 +332,17 @@ export default function ZodiacSignPage() {
           {/* Quick Actions */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
             <Link href="/horoscope/daily">
-              <Button className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-lg py-3">
+              <Button className="w-full bg-gradient-to-r from-purple-700 to-indigo-700 lg:text-[22px] text-[18px] py-3">
                 📅 Ежедневный гороскоп
               </Button>
             </Link>
             <Link href="/horoscope/weekly">
-              <Button className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 text-lg py-3">
+              <Button className="w-full bg-gradient-to-r from-emerald-700 to-teal-700 lg:text-[22px] text-[18px] py-3">
                 📊 Недельный прогноз
               </Button>
             </Link>
             <Link href="/horoscope/compatibility">
-              <Button className="w-full bg-gradient-to-r from-pink-600 to-rose-600 text-lg py-3">
+              <Button className="w-full bg-gradient-to-r from-pink-600 to-rose-700 lg:text-[22px] text-[18px] py-3">
                 💕 Совместимость
               </Button>
             </Link>
