@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { Button } from "@/shared/ui/button";
 import { ChatMessage } from "@/types";
@@ -38,6 +38,9 @@ export const TarotChat = ({
   const [isLoading, setIsLoading] = useState(false);
   const [, setTick] = useState(0);
   const [messagesLoaded, setMessagesLoaded] = useState(false);
+  const [isThinking, setIsThinking] = useState(false);
+  const [thinkingText, setThinkingText] = useState("");
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const {
     canSendMessage,
@@ -45,6 +48,52 @@ export const TarotChat = ({
     getTimeUntilNextMessage,
     formatTimeLeft,
   } = useRateLimits();
+
+  // Фразы для заглушки "думает"
+  const thinkingPhrases = [
+    "Асхат читает карты...",
+    "Энергия карт пробуждается...",
+    "Звёзды шепчут тайны...",
+    "Вижу образы в картах...",
+    "Астральные силы говорят...",
+    "Карты раскрывают секреты...",
+    "Чувствую мощную энергию...",
+    "Тайные знаки проявляются...",
+  ];
+
+  // Автоскролл к концу сообщений
+  const scrollToBottom = () => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollTo({
+        top: messagesEndRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  // Скроллим при добавлении новых сообщений или включении режима "думает"
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, isThinking]);
+
+  // Эффект для смены фраз в режиме "думает"
+  useEffect(() => {
+    if (!isThinking) return;
+
+    // Сразу устанавливаем первую фразу
+    setThinkingText(thinkingPhrases[0]);
+
+    // Меняем фразы каждые 2 секунды
+    const interval = setInterval(() => {
+      setThinkingText((prev) => {
+        const currentIndex = thinkingPhrases.indexOf(prev);
+        const nextIndex = (currentIndex + 1) % thinkingPhrases.length;
+        return thinkingPhrases[nextIndex];
+      });
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [isThinking]);
 
   // Предзаполняем поле ввода вопросом из расклада
   useEffect(() => {
@@ -119,6 +168,7 @@ export const TarotChat = ({
     setMessages((prev) => [...prev, userMessage]);
     setCurrentMessage("");
     setIsLoading(true);
+    setIsThinking(true);
 
     // Регистрируем сообщение в лимитах
     if (readingId) {
@@ -166,6 +216,7 @@ export const TarotChat = ({
         };
 
         setMessages((prev) => [...prev, localGptMessage]);
+        setIsThinking(false);
       } else {
         // Fallback для случаев без readingId (не должно происходить с новым кодом)
         const contextMessage = initialMessage
@@ -191,6 +242,8 @@ export const TarotChat = ({
             )
           );
         });
+
+        setIsThinking(false);
       }
     } catch (error) {
       console.error("Ошибка при получении ответа:", error);
@@ -205,6 +258,7 @@ export const TarotChat = ({
       setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
+      setIsThinking(false);
     }
   };
 
@@ -233,7 +287,10 @@ export const TarotChat = ({
       </div>
 
       {/* Сообщения */}
-      <div className="max-h-96 min-h-32 overflow-y-auto p-4 space-y-4 flex-1">
+      <div
+        ref={messagesEndRef}
+        className="max-h-96 min-h-32 overflow-y-auto p-4 space-y-4 flex-1"
+      >
         {messages.map((message) => (
           <div
             key={message.id}
@@ -262,6 +319,36 @@ export const TarotChat = ({
             </div>
           </div>
         ))}
+
+        {/* Заглушка "думает" */}
+        {isThinking && (
+          <div className="flex justify-start">
+            <div className="max-w-xs lg:max-w-md px-4 py-3 rounded-lg text-sm bg-black/60 border border-purple-400/30 text-white">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1">
+                  <div
+                    className="w-2 h-2 bg-gradient-to-r from-purple-400 to-indigo-400 rounded-full animate-bounce shadow-sm shadow-purple-400/50"
+                    style={{ animationDelay: "0ms" }}
+                  ></div>
+                  <div
+                    className="w-2 h-2 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full animate-bounce shadow-sm shadow-indigo-400/50"
+                    style={{ animationDelay: "150ms" }}
+                  ></div>
+                  <div
+                    className="w-2 h-2 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full animate-bounce shadow-sm shadow-purple-400/50"
+                    style={{ animationDelay: "300ms" }}
+                  ></div>
+                </div>
+                <span className="text-purple-300 text-xs italic font-medium">
+                  {thinkingText}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Элемент для автоскролла */}
+        <div />
       </div>
 
       {/* Поле ввода */}

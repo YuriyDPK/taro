@@ -6,10 +6,9 @@ import { AuthProviderSelector } from "./AuthProviderSelector";
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onCloseMenu: () => void;
 }
 
-export function AuthModal({ isOpen, onClose, onCloseMenu }: AuthModalProps) {
+export function AuthModal({ isOpen, onClose }: AuthModalProps) {
   if (!isOpen) return null;
 
   return (

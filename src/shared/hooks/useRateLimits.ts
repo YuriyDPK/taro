@@ -32,7 +32,7 @@ export const useRateLimits = () => {
     if (isPremium) return true;
 
     const now = Date.now();
-    const fiveMinutes = 1 * 60 * 1000;
+    const fiveMinutes = 15 * 60 * 1000;
 
     const lastReading = readingLimits.sort(
       (a, b) => b.lastReading - a.lastReading
@@ -50,7 +50,7 @@ export const useRateLimits = () => {
       if (isPremium) return true;
 
       const now = Date.now();
-      const fiveMinutes = 1 * 60 * 1000;
+      const fiveMinutes = 15 * 60 * 1000;
 
       const readingLimit = readingLimits.find((r) => r.readingId === readingId);
       if (!readingLimit) return true;
@@ -69,7 +69,7 @@ export const useRateLimits = () => {
     if (isPremium) return 0;
 
     const now = Date.now();
-    const fiveMinutes = 1 * 60 * 1000;
+    const fiveMinutes = 15 * 60 * 1000;
 
     const lastReading = readingLimits.sort(
       (a, b) => b.lastReading - a.lastReading
@@ -90,7 +90,7 @@ export const useRateLimits = () => {
       if (isPremium) return 0;
 
       const now = Date.now();
-      const fiveMinutes = 1 * 60 * 1000;
+      const fiveMinutes = 15 * 60 * 1000;
 
       const messageLimit = messageLimits[readingId];
       if (!messageLimit) return 0;
@@ -154,7 +154,7 @@ export const useRateLimits = () => {
       if (!messageLimit) return false;
 
       const now = Date.now();
-      const fiveMinutes = 1 * 60 * 1000;
+      const fiveMinutes = 15 * 60 * 1000;
       const timePassed = now - messageLimit.lastAction;
 
       return timePassed < fiveMinutes;
