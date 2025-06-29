@@ -101,6 +101,7 @@ export default function RootLayout({
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#2A2641" />
+        <meta name="yandex-verification" content="7480909fd367eb09" />
         <link
           rel="canonical"
           href={process.env.NEXTAUTH_URL || "http://localhost:3000"}
