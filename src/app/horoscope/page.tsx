@@ -57,7 +57,7 @@ export default function HoroscopePage() {
             </p>
 
             {/* Quick Actions */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
+            <div className="flex flex-col lg:flex-row gap-4 justify-center items-center mb-8">
               <Link href="/horoscope/daily">
                 <Button className="bg-gradient-to-r from-purple-600 to-indigo-600 text-lg px-8 py-3">
                   📅 Гороскоп на сегодня
@@ -117,7 +117,7 @@ export default function HoroscopePage() {
           </div>
 
           {/* Zodiac Signs Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {filteredSigns.map((sign) => (
               <Link
                 key={sign.id}
@@ -230,12 +230,12 @@ export default function HoroscopePage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/horoscope/daily">
-                <Button className="bg-gradient-to-r from-purple-600 to-pink-600 text-lg px-8 py-3">
+                <Button className="bg-gradient-to-r from-purple-600 to-pink-600 lg:text-lg text-[14px] px-8 py-3">
                   🌟 Мой гороскоп на сегодня
                 </Button>
               </Link>
               <Link href="/horoscope/compatibility">
-                <Button className="bg-transparent border-2 border-purple-400 text-purple-300 hover:bg-purple-600/20 text-lg px-8 py-3">
+                <Button className="bg-transparent border-2 border-purple-400 text-purple-300 hover:bg-purple-600/20 lg:text-lg text-[14px] px-8 py-3">
                   💕 Проверить совместимость
                 </Button>
               </Link>

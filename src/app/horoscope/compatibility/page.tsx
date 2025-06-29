@@ -232,7 +232,7 @@ export default function CompatibilityPage() {
                 <div className="text-center">
                   <Button
                     onClick={handleCalculate}
-                    className="bg-gradient-to-r from-pink-600 to-rose-600 text-xl px-12 py-4"
+                    className="bg-gradient-to-r from-pink-600 to-rose-600 lg:text-xl text-[14px] lg:px-12 py-4"
                   >
                     💖 Рассчитать совместимость
                   </Button>

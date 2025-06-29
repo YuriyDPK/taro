@@ -104,7 +104,7 @@ export default function DailyHoroscopePage() {
               </p>
               <Button
                 onClick={autoDetectSign}
-                className="bg-gradient-to-r from-purple-600 to-indigo-600 text-lg px-8 py-3"
+                className="bg-gradient-to-r from-purple-600 to-indigo-600 lg:text-lg text-[14px] lg:px-8 py-3"
               >
                 🔮 Определить мой знак автоматически
               </Button>
@@ -147,7 +147,7 @@ export default function DailyHoroscopePage() {
             <div className="space-y-8">
               {/* Sign Info */}
               <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6">
-                <div className="flex items-center justify-between mb-6">
+                <div className="flex flex-col lg:flex-row items-center justify-between mb-6">
                   <div className="flex items-center gap-4">
                     <div className="text-5xl">{selectedSignData.emoji}</div>
                     <div>
