@@ -195,7 +195,7 @@ export const Header = () => {
 
               {/* Auth кнопка под пунктами меню */}
               <div className="border-b border-purple-400/30 pb-4">
-                <SignInButton onClose={closeMenu} />
+                <SignInButton onClose={closeMenu} onCloseMenu={closeMenu} />
               </div>
             </nav>
 
@@ -210,6 +210,7 @@ export const Header = () => {
       {/* Модальное окно авторизации */}
       <AuthModal
         isOpen={showAuthModal}
+        onCloseMenu={closeMenu}
         onClose={() => setShowAuthModal(false)}
       />
     </header>

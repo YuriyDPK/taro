@@ -5,7 +5,13 @@ import { Button } from "@/shared/ui/button";
 import { UserDropdown } from "./UserDropdown";
 import { AuthProviderSelector } from "./AuthProviderSelector";
 
-export function SignInButton({ onClose }: { onClose?: () => void }) {
+export function SignInButton({
+  onClose,
+  onCloseMenu,
+}: {
+  onClose?: () => void;
+  onCloseMenu?: () => void;
+}) {
   const { data: session, status } = useSession();
 
   if (status === "loading") {
@@ -24,8 +30,8 @@ export function SignInButton({ onClose }: { onClose?: () => void }) {
   }
 
   if (session?.user) {
-    return <UserDropdown />;
+    return <UserDropdown onCloseMenu={onCloseMenu || (() => {})} />;
   }
 
-  return <AuthProviderSelector onClose={onClose} />;
+  return <AuthProviderSelector onClose={onClose} onCloseMenu={onCloseMenu} />;
 }

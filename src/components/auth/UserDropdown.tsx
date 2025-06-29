@@ -24,7 +24,7 @@ interface UserStats {
   lastReadingDate?: string;
 }
 
-export function UserDropdown() {
+export function UserDropdown({ onCloseMenu }: { onCloseMenu: () => void }) {
   const { data: session } = useSession();
   const [isOpen, setIsOpen] = useState(false);
   const [userStats, setUserStats] = useState<UserStats | null>(null);
@@ -218,14 +218,26 @@ export function UserDropdown() {
 
           {/* Actions */}
           <div className="p-4 flex flex-col gap-2 items-center">
-            <Link href="/profile" onClick={() => setIsOpen(false)}>
+            <Link
+              href="/profile"
+              onClick={() => {
+                setIsOpen(false);
+                onCloseMenu();
+              }}
+            >
               <Button className=" text-sm justify-start text-left bg-transparent border border-purple-400/30 text-purple-300 hover:text-white hover:bg-purple-600/20">
                 <User size={16} className="mr-2" />
                 Перейти в профиль
               </Button>
             </Link>
 
-            <Link href="/support" onClick={() => setIsOpen(false)}>
+            <Link
+              href="/support"
+              onClick={() => {
+                setIsOpen(false);
+                onCloseMenu();
+              }}
+            >
               <Button className=" text-sm justify-start text-left bg-transparent border border-blue-400/30 text-blue-300 hover:text-white hover:bg-blue-600/20">
                 <HelpCircle size={16} className="mr-2" />
                 Техническая поддержка
@@ -233,7 +245,13 @@ export function UserDropdown() {
             </Link>
 
             {session?.user?.role === "admin" && (
-              <Link href="/admin" onClick={() => setIsOpen(false)}>
+              <Link
+                href="/admin"
+                onClick={() => {
+                  setIsOpen(false);
+                  onCloseMenu();
+                }}
+              >
                 <Button className=" text-sm justify-start text-left bg-transparent border border-red-400/30 text-red-300 hover:text-white hover:bg-red-600/20">
                   <Settings size={16} className="mr-2" />
                   Админка
@@ -242,7 +260,10 @@ export function UserDropdown() {
             )}
 
             <Button
-              onClick={() => signOut()}
+              onClick={() => {
+                signOut();
+                onCloseMenu();
+              }}
               className=" text-sm justify-start text-left bg-transparent border border-red-400/30 text-red-300 hover:text-white hover:bg-red-600/20"
             >
               <LogOut size={16} className="mr-2" />

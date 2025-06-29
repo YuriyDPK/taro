@@ -7,17 +7,22 @@ import { User } from "lucide-react";
 interface AuthProviderSelectorProps {
   className?: string;
   onClose?: () => void;
+  onCloseMenu?: () => void;
 }
 
 export function AuthProviderSelector({
   className = "",
   onClose,
+  onCloseMenu,
 }: AuthProviderSelectorProps) {
   const router = useRouter();
 
   const handleSignIn = () => {
     if (onClose) {
       onClose();
+    }
+    if (onCloseMenu) {
+      onCloseMenu();
     }
     router.push("/auth/signin");
   };
